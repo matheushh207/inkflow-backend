@@ -93,7 +93,7 @@ export default function SettingsPage() {
     };
 
     const handleCopyLink = () => {
-        const link = `tatuador.app/${localSettings.studioName.toLowerCase().replace(/\s+/g, '')}`;
+        const link = `https://inkflowcrm.onrender.com/reserva`;
         navigator.clipboard.writeText(link);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
@@ -413,7 +413,7 @@ export default function SettingsPage() {
                                     <p className="text-[12px] font-black text-zinc-600 uppercase tracking-widest">Link Público de Reserva</p>
                                     <div className="flex gap-2">
                                         <div className="flex-1 bg-black border border-white/5 rounded-xl p-3 text-[13px] text-zinc-500 font-mono flex items-center overflow-hidden">
-                                            <span className="truncate">tatuador.app/{localSettings.studioName.toLowerCase().replace(/\s+/g, '')}</span>
+                                            <span className="truncate">https://inkflowcrm.onrender.com/reserva</span>
                                         </div>
                                         <button
                                             onClick={handleCopyLink}
