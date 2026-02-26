@@ -9,6 +9,15 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "INK FLOW - Tattoo Studio Management",
   description: "Advanced Multi-tenant SaaS for Professional Tattoo Studios",
+  icons: {
+    icon: [
+      {
+        url: "/logo.png",
+        sizes: "any",
+        type: "image/png",
+      }
+    ],
+  },
 };
 
 export default function RootLayout({

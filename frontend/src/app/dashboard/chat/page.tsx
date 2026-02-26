@@ -277,7 +277,7 @@ export default function ChatPage() {
                         </header>
 
                         {/* MESSAGES AREA */}
-                        <div className="flex-1 overflow-y-auto p-6 space-y-4 relative bg-[#080808]">
+                        <div className="flex-1 overflow-y-auto p-4 space-y-3 relative bg-[#080808]">
                             {/* LOGO BACKGROUND */}
                             <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.1] z-0 px-20">
                                 <img src="/logo.png" alt="" className="w-full max-w-[280px] grayscale invert brightness-200" />
@@ -289,14 +289,14 @@ export default function ChatPage() {
                                         {clientMessages.map((msg, i) => (
                                             <div key={i} className={cn("flex flex-col gap-1 max-w-[75%]", msg.fromMe ? "ml-auto items-end" : "items-start")}>
                                                 <div className={cn(
-                                                    "p-4 rounded-2xl text-[14px] font-medium leading-relaxed font-sans shadow-lg",
+                                                    "p-3 rounded-2xl text-[12px] font-medium leading-relaxed font-sans shadow-lg",
                                                     msg.fromMe
                                                         ? "bg-gold-polished text-black rounded-tr-none shadow-gold-polished/5"
                                                         : "bg-[#1A1A1A] text-zinc-300 border border-white/5 rounded-tl-none shadow-black"
                                                 )}>
                                                     {msg.body}
                                                 </div>
-                                                <span className="text-[12px] text-zinc-600 font-bold px-1">
+                                                <span className="text-[10px] text-zinc-600 font-bold px-1">
                                                     {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                 </span>
                                             </div>
@@ -322,7 +322,7 @@ export default function ChatPage() {
                                         onChange={(e) => setNewMessage(e.target.value)}
                                         onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                                         placeholder="Digite sua mensagem..."
-                                        className="w-full bg-black border border-white/10 rounded-2xl py-3 px-5 text-sm text-white focus:outline-none focus:border-gold-polished/40 transition-all font-medium"
+                                        className="w-full bg-black border border-white/10 rounded-2xl py-2 px-4 text-xs text-white focus:outline-none focus:border-gold-polished/40 transition-all font-medium"
                                     />
                                 </div>
                                 <button
