@@ -174,7 +174,7 @@ export default function ChatPage() {
     };
 
     return (
-        <div className="h-[calc(100vh-120px)] min-h-[600px] flex flex-col md:flex-row overflow-hidden premium-card p-0 bg-[#0A0A0A] border-white/5 shadow-2xl relative">
+        <div className="w-full h-auto md:h-[calc(100vh-120px)] flex flex-col md:flex-row overflow-x-hidden md:overflow-hidden premium-card p-0 bg-[#0A0A0A] border-white/5 shadow-2xl relative">
             {/* SIDEBAR: CONVERSATIONS */}
             <aside className={cn(
                 "w-full md:w-80 border-white/5 flex flex-col bg-[#0D0D0D]",

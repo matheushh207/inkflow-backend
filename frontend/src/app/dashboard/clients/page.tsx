@@ -51,7 +51,7 @@ export default function ClientsPage() {
     };
 
     return (
-        <div className="space-y-6 animate-premium-fade">
+        <div className="space-y-6 animate-premium-fade w-full overflow-x-hidden">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                 <h3 className="text-xl font-black text-white uppercase border-l-4 border-gold-polished pl-4 w-full md:w-auto">CRM de Clientes</h3>
 

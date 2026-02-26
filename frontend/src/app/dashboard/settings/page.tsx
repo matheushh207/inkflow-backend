@@ -139,7 +139,7 @@ export default function SettingsPage() {
 
 
     return (
-        <div className="space-y-8 animate-premium-fade">
+        <div className="space-y-6 md:space-y-8 animate-premium-fade w-full overflow-x-hidden">
             <div className="flex justify-between items-end">
                 <div>
                     <h1 className="text-4xl font-black text-white tracking-tighter uppercase italic">Configurações</h1>

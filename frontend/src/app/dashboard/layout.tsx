@@ -151,9 +151,9 @@ export default function DashboardLayout({
             </aside>
 
             {/* MAIN CONTENT */}
-            <main className="flex-1 flex flex-col overflow-hidden">
+            <main className="flex-1 flex flex-col overflow-hidden md:overflow-hidden">
                 {/* TOP HEADER */}
-                <header className="h-16 md:h-20 border-b border-premium-border flex items-center justify-between px-4 md:px-8 bg-[#0A0A0A]/50 backdrop-blur-xl z-10">
+                <header className="h-16 md:h-20 border-b border-premium-border flex items-center justify-between px-4 md:px-8 bg-[#0A0A0A]/50 backdrop-blur-xl z-10 flex-shrink-0">
                     <div className="flex items-center gap-4">
                         <button
                             onClick={() => setMobileMenuOpen(true)}
@@ -179,7 +179,7 @@ export default function DashboardLayout({
                     </div>
                 </header>
 
-                <div className="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-hide">
+                <div className="flex-1 overflow-y-auto p-3 md:p-8 scrollbar-hide">
                     {children}
                 </div>
             </main>
