@@ -1,0 +1,10 @@
+{
+  "name": "inkflow-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "cd backend && npm install && npm run build",
+    "start": "cd backend && npm run start:prod",
+    "dev": "cd backend && npm run start:dev"
+  }
+}
