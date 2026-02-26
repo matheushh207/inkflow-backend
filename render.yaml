@@ -2,9 +2,8 @@ services:
   - type: web
     name: inkflow-backend
     runtime: node
-    buildCommand: npm install && npm run build
-    startCommand: npm run start:prod
+    buildCommand: npm install --prefix backend && npm run build --prefix backend
+    startCommand: npm run start:prod --prefix backend
     envVars:
       - key: NODE_ENV
         value: production
-    root: backend
