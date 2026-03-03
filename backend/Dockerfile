@@ -9,26 +9,22 @@ ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 WORKDIR /app
 
-# Copiar package.json e package-lock.json para instalar dependências
-COPY package*.json ./
+# Copiar package.json e package-lock.json do BACKEND para instalar dependências
+COPY backend/package*.json ./
 
 # Instalar dependências do Node.js
 RUN npm install
 
-# Copiar o restante do código da aplicação
-COPY . .
+# Copiar o restante do código do BACKEND
+COPY backend/ .
 
-# Depuração: Listar arquivos para garantir que a pasta prisma e schema.prisma existem
-RUN ls -la
-RUN ls -la prisma/
-
-# Gerar cliente Prisma (usando caminho explícito)
-RUN npx prisma generate --schema ./prisma/schema.prisma
+# Gerar cliente Prisma
+RUN npx prisma generate
 
 # Construir a aplicação NestJS
 RUN npm run build
 
-# Expor a porta que a aplicação NestJS escuta (3000 por padrão )
+# Expor a porta que a aplicação NestJS escuta (3000 por padrão)
 EXPOSE 3000
 
 # Comando para iniciar a aplicação
