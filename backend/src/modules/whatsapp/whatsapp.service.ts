@@ -13,7 +13,7 @@ export class WhatsappService implements OnModuleInit {
     constructor(private readonly gateway: WhatsappGateway) {
         this.client = new Client({
             authStrategy: new LocalAuth({
-                clientId: 'ink-flow-session',
+                clientId: 'ink-flow-v2', // Changed to force a fresh session
                 dataPath: './.wwebjs_auth'
             }),
             authTimeoutMs: 120000, // Increase to 120s for cloud boots
@@ -34,6 +34,7 @@ export class WhatsappService implements OnModuleInit {
                     '--disable-extensions',
                     '--disable-component-update',
                     '--disable-features=IsolateOrigins,site-per-process',
+                    '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
                 ],
             },
         });
