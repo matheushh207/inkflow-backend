@@ -30,7 +30,10 @@ export class WhatsappService implements OnModuleInit {
                     '--no-zygote',
                     '--single-process',
                     '--disable-gpu',
-                    '--font-render-hinting=none'
+                    '--font-render-hinting=none',
+                    '--disable-extensions',
+                    '--disable-component-update',
+                    '--disable-features=IsolateOrigins,site-per-process',
                 ],
             },
         });

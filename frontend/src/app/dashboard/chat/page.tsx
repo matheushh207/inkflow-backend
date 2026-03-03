@@ -46,16 +46,24 @@ export default function ChatPage() {
             transports: ['websocket', 'polling'],
         });
 
-        socketRef.current.on('connect', () => console.log('Socket connected'));
+        socketRef.current.on('connect', () => {
+            console.log('Socket connected');
+            setConnectionStatus('INITIALIZING'); // Reset starting state on connect
+        });
         socketRef.current.on('connect_error', (err) => {
             console.error('Socket connect error', err);
-            setConnectionStatus('DISCONNECTED');
+            // Only set DISCONNECTED if it's a persistent failure
+            // socket.io handles retries automatically
+        });
+        socketRef.current.on('reconnect_attempt', () => {
+            console.log('Attempting to reconnect...');
         });
         socketRef.current.on('qr', (qr: string) => {
             setQrCode(qr);
             setConnectionStatus('AWAITING_SCAN');
         });
         socketRef.current.on('status', (status: any) => {
+            console.log('WhatsApp status update:', status);
             setConnectionStatus(status);
             if (status === 'READY') setQrCode(null);
         });
@@ -337,13 +345,16 @@ export default function ChatPage() {
                 ) : (
                     <div className="flex-1 flex flex-col items-center justify-center p-12 text-center bg-[#050505]">
                         {connectionStatus === 'DISCONNECTED' ? (
-                        <div className="space-y-4 max-w-sm text-center">
-                            <p className="text-sm font-bold text-rose-500">Erro de conexão ao servidor de chat.</p>
-                            <p className="text-xs text-zinc-400">
-                                Verifique se a variável de ambiente <code>NEXT_PUBLIC_WS_URL</code> ou <code>NEXT_PUBLIC_API_URL</code> está definida corretamente e se o backend está acessível.
-                            </p>
-                        </div>
-                    ) : connectionStatus !== 'READY' && connectionStatus !== 'AUTHENTICATED' ? (
+                            <div className="space-y-4 max-w-sm text-center">
+                                <p className="text-sm font-bold text-rose-500 italic uppercase tracking-widest animate-pulse">Tentando Reconectar...</p>
+                                <p className="text-xs text-zinc-400">
+                                    O servidor pode estar reiniciando ou em modo de espera. Aguarde alguns segundos.
+                                </p>
+                                <div className="w-full bg-white/5 h-1 rounded-full overflow-hidden">
+                                    <div className="bg-gold-polished h-full animate-progress-loading" />
+                                </div>
+                            </div>
+                        ) : connectionStatus !== 'READY' && connectionStatus !== 'AUTHENTICATED' ? (
                             <div className="space-y-8 max-w-sm animate-premium-fade">
                                 {qrCode ? (
                                     <div className="space-y-6">
