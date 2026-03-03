@@ -18,8 +18,12 @@ RUN npm install
 # Copiar o restante do código da aplicação
 COPY . .
 
-# Gerar cliente Prisma
-RUN npx prisma generate
+# Depuração: Listar arquivos para garantir que a pasta prisma e schema.prisma existem
+RUN ls -la
+RUN ls -la prisma/
+
+# Gerar cliente Prisma (usando caminho explícito)
+RUN npx prisma generate --schema ./prisma/schema.prisma
 
 # Construir a aplicação NestJS
 RUN npm run build
