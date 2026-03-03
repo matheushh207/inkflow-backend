@@ -4,6 +4,9 @@ FROM node:20-alpine
 # Baseado em https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md#running-puppeteer-on-alpine
 RUN apk add --no-cache udev chromium nss freetype freetype-dev harfbuzz ca-certificates 
 
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
 WORKDIR /app
 
 # Copiar package.json e package-lock.json para instalar dependências

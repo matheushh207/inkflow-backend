@@ -19,6 +19,7 @@ export class WhatsappService implements OnModuleInit {
             authTimeoutMs: 60000, // Increase timeout for slow cloud boots
             qrMaxRetries: 10,
             puppeteer: {
+                executablePath: '/usr/bin/chromium-browser',
                 args: [
                     '--no-sandbox',
                     '--disable-setuid-sandbox',
@@ -26,7 +27,7 @@ export class WhatsappService implements OnModuleInit {
                     '--disable-accelerated-2d-canvas',
                     '--no-first-run',
                     '--no-zygote',
-                    '--single-process', // Better for low-memory cloud instances
+                    '--single-process',
                     '--disable-gpu'
                 ],
                 headless: true,

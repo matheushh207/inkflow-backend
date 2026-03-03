@@ -1,6 +1,8 @@
 .DS_Store
 .env
 .env.*
+# allow production environment file to be checked in if needed
+!.env.production
 
 # Logs
 npm-debug.log*
