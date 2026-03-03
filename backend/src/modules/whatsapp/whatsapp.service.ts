@@ -16,10 +16,11 @@ export class WhatsappService implements OnModuleInit {
                 clientId: 'ink-flow-session',
                 dataPath: './.wwebjs_auth'
             }),
-            authTimeoutMs: 60000, // Increase timeout for slow cloud boots
-            qrMaxRetries: 10,
+            authTimeoutMs: 120000, // Increase to 120s for cloud boots
+            qrMaxRetries: 20,
             puppeteer: {
                 executablePath: '/usr/bin/chromium-browser',
+                headless: true,
                 args: [
                     '--no-sandbox',
                     '--disable-setuid-sandbox',
@@ -28,24 +29,26 @@ export class WhatsappService implements OnModuleInit {
                     '--no-first-run',
                     '--no-zygote',
                     '--single-process',
-                    '--disable-gpu'
+                    '--disable-gpu',
+                    '--font-render-hinting=none'
                 ],
-                headless: true,
             },
         });
     }
 
     onModuleInit() {
-        // We can either auto-initialize or wait for a manual trigger.
-        // Let's keep auto-initialize for now but ensure it's idempotent.
+        this.logger.log('WhatsappModule onModuleInit starting initial initialize()...');
         this.initialize();
     }
 
     public async initialize() {
         if (this.isReady) {
+            this.logger.log('Client is already READY, skipping re-initialization.');
             this.gateway.sendStatus('READY');
             return;
         }
+
+        this.logger.log('Starting WhatsApp client initialization sequence...');
 
         // Cleanup any existing instance listeners
         this.client.removeAllListeners('qr');
