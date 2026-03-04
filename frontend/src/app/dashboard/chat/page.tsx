@@ -52,8 +52,8 @@ export default function ChatPage() {
         });
         socketRef.current.on('connect_error', (err) => {
             console.error('Socket connect error', err);
-            // Only set DISCONNECTED if it's a persistent failure
-            // socket.io handles retries automatically
+            // If connection fails persistently, show disconnected
+            setConnectionStatus('DISCONNECTED');
         });
         socketRef.current.on('reconnect_attempt', () => {
             console.log('Attempting to reconnect...');
@@ -66,6 +66,7 @@ export default function ChatPage() {
             console.log('WhatsApp status update:', status);
             setConnectionStatus(status);
             if (status === 'READY') setQrCode(null);
+            if (status === 'INITIALIZING') setQrCode(null);
         });
         socketRef.current.on('message', (message: any) => {
             setMessages(prev => {

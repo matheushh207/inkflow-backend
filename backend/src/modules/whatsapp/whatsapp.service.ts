@@ -18,11 +18,9 @@ export class WhatsappService implements OnModuleInit, OnModuleDestroy {
                 clientId: 'ink-flow-v2',
                 dataPath: process.env.WHATSAPP_SESSION_PATH || './.wwebjs_auth'
             }),
-            authTimeoutMs: 120000, // Increase to 120s for cloud boots
+            authTimeoutMs: 120000,
             qrMaxRetries: 20,
             puppeteer: {
-                // If on Render or Linux, we might need a specific path, but letting it auto-detect is usually safer
-                // unless explicitly required. The user's example didn't include executablePath.
                 headless: true,
                 args: [
                     '--no-sandbox',
@@ -31,7 +29,6 @@ export class WhatsappService implements OnModuleInit, OnModuleDestroy {
                     '--disable-accelerated-2d-canvas',
                     '--no-first-run',
                     '--no-zygote',
-                    '--single-process',
                     '--disable-gpu',
                     '--font-render-hinting=none',
                     '--disable-extensions',
@@ -106,6 +103,7 @@ export class WhatsappService implements OnModuleInit, OnModuleDestroy {
         this.client.on('disconnected', async (reason) => {
             this.logger.warn('WhatsApp Client disconnected:', reason);
             this.isReady = false;
+            this.isAuthenticated = false;
             this.gateway.sendStatus('DISCONNECTED');
             this.resetAndRestart();
         });
