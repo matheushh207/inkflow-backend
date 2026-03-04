@@ -1,25 +1,27 @@
-import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
+import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
 import { Client, LocalAuth } from 'whatsapp-web.js';
 import * as qrcode from 'qrcode';
 import { WhatsappGateway } from './whatsapp.gateway';
 
 @Injectable()
-export class WhatsappService implements OnModuleInit {
+export class WhatsappService implements OnModuleInit, OnModuleDestroy {
     private client: Client;
     private readonly logger = new Logger(WhatsappService.name);
     private qrCode: string | null = null;
+    private isInitializing = false;
     private isReady = false;
 
     constructor(private readonly gateway: WhatsappGateway) {
         this.client = new Client({
             authStrategy: new LocalAuth({
-                clientId: 'ink-flow-v2', // Changed to force a fresh session
-                dataPath: './.wwebjs_auth'
+                clientId: 'ink-flow-v2',
+                dataPath: process.env.WHATSAPP_SESSION_PATH || './.wwebjs_auth'
             }),
             authTimeoutMs: 120000, // Increase to 120s for cloud boots
             qrMaxRetries: 20,
             puppeteer: {
-                executablePath: '/usr/bin/chromium-browser',
+                // If on Render or Linux, we might need a specific path, but letting it auto-detect is usually safer
+                // unless explicitly required. The user's example didn't include executablePath.
                 headless: true,
                 args: [
                     '--no-sandbox',
@@ -40,18 +42,29 @@ export class WhatsappService implements OnModuleInit {
         });
     }
 
+    async onModuleDestroy() {
+        this.logger.log('Shutting down WhatsApp client...');
+        try {
+            await this.client.destroy();
+            this.logger.log('WhatsApp client destroyed successfully.');
+        } catch (err) {
+            this.logger.error('Error destroying WhatsApp client:', err);
+        }
+    }
+
     onModuleInit() {
         this.logger.log('WhatsappModule onModuleInit starting initial initialize()...');
         this.initialize();
     }
 
     public async initialize() {
-        if (this.isReady) {
-            this.logger.log('Client is already READY, skipping re-initialization.');
-            this.gateway.sendStatus('READY');
+        if (this.isReady || this.isInitializing) {
+            this.logger.log('Client is already READY or currently INITIALIZING, skipping.');
+            if (this.isReady) this.gateway.sendStatus('READY');
             return;
         }
 
+        this.isInitializing = true;
         this.logger.log('Starting WhatsApp client initialization sequence...');
 
         // Cleanup any existing instance listeners
@@ -72,6 +85,7 @@ export class WhatsappService implements OnModuleInit {
         this.client.on('ready', () => {
             this.logger.log('WhatsApp Client is READY!');
             this.isReady = true;
+            this.isInitializing = false;
             this.qrCode = null;
             this.gateway.sendStatus('READY');
         });
@@ -110,6 +124,7 @@ export class WhatsappService implements OnModuleInit {
             await this.client.initialize();
         } catch (err) {
             this.logger.error('Failed to initialize WhatsApp client:', err);
+            this.isInitializing = false;
             this.gateway.sendStatus('ERROR');
             this.resetAndRestart();
         }
