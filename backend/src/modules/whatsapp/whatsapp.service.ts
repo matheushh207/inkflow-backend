@@ -9,6 +9,7 @@ export class WhatsappService implements OnModuleInit, OnModuleDestroy {
     private readonly logger = new Logger(WhatsappService.name);
     private qrCode: string | null = null;
     private isInitializing = false;
+    private isAuthenticated = false;
     private isReady = false;
 
     constructor(private readonly gateway: WhatsappGateway) {
@@ -92,6 +93,7 @@ export class WhatsappService implements OnModuleInit, OnModuleDestroy {
 
         this.client.on('authenticated', () => {
             this.logger.log('WhatsApp Client AUTHENTICATED');
+            this.isAuthenticated = true;
             this.gateway.sendStatus('AUTHENTICATED');
         });
 
@@ -231,6 +233,7 @@ export class WhatsappService implements OnModuleInit, OnModuleDestroy {
 
     getStatus() {
         if (this.isReady) return 'READY';
+        if (this.isAuthenticated) return 'AUTHENTICATED';
         if (this.qrCode) return 'AWAITING_SCAN';
         return 'INITIALIZING';
     }

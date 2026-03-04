@@ -388,6 +388,21 @@ export default function ChatPage() {
                                     </div>
                                 )}
                             </div>
+                        ) : connectionStatus === 'AUTHENTICATED' ? (
+                            <div className="space-y-6 max-w-sm text-center animate-premium-fade">
+                                <div className="w-20 h-20 rounded-full bg-emerald-500/5 border border-emerald-500/10 flex items-center justify-center mx-auto">
+                                    <ShieldCheck className="w-8 h-8 text-emerald-500 animate-pulse" />
+                                </div>
+                                <div>
+                                    <h2 className="text-lg font-black text-white uppercase italic tracking-tighter mb-2">Quase lá!</h2>
+                                    <p className="text-zinc-500 text-sm font-bold uppercase tracking-widest leading-relaxed">
+                                        WhatsApp autenticado. Sincronizando suas mensagens e contatos...
+                                    </p>
+                                </div>
+                                <div className="w-full bg-white/5 h-1 rounded-full overflow-hidden">
+                                    <div className="bg-emerald-500 h-full animate-progress-loading" />
+                                </div>
+                            </div>
                         ) : (
                             <div className="space-y-6 max-w-sm opacity-40">
                                 <div className="w-20 h-20 rounded-full bg-gold-polished/5 border border-gold-polished/10 flex items-center justify-center mx-auto">
