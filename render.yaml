@@ -7,3 +7,13 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+
+  - type: web
+    name: inkflow-frontend
+    runtime: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+    rootDir: ./frontend

@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "cd backend && npm install && npx prisma generate && npm run build",
-    "start": "cd backend && npm run start:prod",
-    "dev": "cd backend && npm run start:dev"
+    "build:backend": "cd backend && npm install && npx prisma generate && npm run build",
+    "start:backend": "cd backend && npm run start:prod",
+    "build:frontend": "cd frontend && npm install && npm run build",
+    "start:frontend": "cd frontend && npm run start",
+    "build": "npm run build:backend && npm run build:frontend"
   }
 }
