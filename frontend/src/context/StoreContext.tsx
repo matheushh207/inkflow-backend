@@ -110,7 +110,6 @@ export interface TeamMember {
         financeiro: boolean;
         clientes: boolean;
         estoque: boolean;
-        chat: boolean;
         configuracoes: boolean;
     };
 }
@@ -133,7 +132,6 @@ interface StoreState {
     studioLogo: string;
     accentColor: string;
     notificationSettings: {
-        whatsapp: boolean;
         email: boolean;
         push: boolean;
     };
@@ -204,7 +202,6 @@ const INITIAL_STATE: StoreState = {
                 financeiro: true,
                 clientes: true,
                 estoque: true,
-                chat: true,
                 configuracoes: true
             }
         },
@@ -220,7 +217,6 @@ const INITIAL_STATE: StoreState = {
     studioLogo: '/logo.png',
     accentColor: '#FFD700',
     notificationSettings: {
-        whatsapp: true,
         email: true,
         push: false
     },
@@ -416,8 +412,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             id: Math.random().toString(36).substr(2, 9),
             appointmentsCount: 0,
             permissions: member.role === 'Administrador'
-                ? { agenda: true, financeiro: true, clientes: true, estoque: true, chat: true, configuracoes: true }
-                : { agenda: true, financeiro: false, clientes: true, estoque: false, chat: true, configuracoes: false }
+                ? { agenda: true, financeiro: true, clientes: true, estoque: true, configuracoes: true }
+                : { agenda: true, financeiro: false, clientes: true, estoque: false, configuracoes: false }
         };
         setState(prev => ({ ...prev, team: [newMember, ...prev.team] }));
     };
