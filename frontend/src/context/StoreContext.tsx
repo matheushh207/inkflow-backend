@@ -252,8 +252,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
                         ...m,
                         permissions: m.permissions || (
                             m.role === 'Administrador'
-                                ? { agenda: true, financeiro: true, clientes: true, estoque: true, chat: true, configuracoes: true }
-                                : { agenda: true, financeiro: false, clientes: true, estoque: false, chat: true, configuracoes: false }
+                                ? { agenda: true, financeiro: true, clientes: true, estoque: true, configuracoes: true }
+                                : { agenda: true, financeiro: false, clientes: true, estoque: false, configuracoes: false }
                         )
                     }));
                 }

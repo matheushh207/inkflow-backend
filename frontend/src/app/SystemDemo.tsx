@@ -18,7 +18,6 @@ import {
     FileSignature,
     HeartPulse,
     Image as ImageIcon,
-    MessageSquare,
     Play,
     Pause,
     RotateCcw,
@@ -532,13 +531,7 @@ function PortfolioView() {
     );
 }
 
-function ChatView() {
-    return (
-        <div className="p-8 text-center text-zinc-500">
-            <p className="text-sm font-black uppercase tracking-widest">Módulo em Manutenção</p>
-        </div>
-    );
-}
+
 
 function SettingsView() {
     return (
