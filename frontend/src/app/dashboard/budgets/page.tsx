@@ -5,13 +5,13 @@ import {
     Search,
     MoreHorizontal,
     Calendar,
-    MessageSquare,
     ExternalLink,
     Filter,
     FilterX,
     X,
     CheckCircle2,
-    Trash2
+    Trash2,
+    ClipboardList
 } from 'lucide-react';
 import { useState } from 'react';
 import Link from 'next/link';
@@ -146,7 +146,7 @@ export default function BudgetsPage() {
             {/* Empty State */}
             {budgets.length === 0 && (
                 <div className="text-center py-20 opacity-30">
-                    <MessageSquare className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
+                    <ClipboardList className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
                     <p className="text-xs font-black uppercase tracking-widest text-zinc-500">Nenhum orçamento em análise</p>
                 </div>
             )}

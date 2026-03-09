@@ -25,7 +25,8 @@ import {
     Settings,
     User,
     ClipboardList,
-    Camera
+    Camera,
+    Mail as MailIcon
 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -47,7 +48,6 @@ const MENU_ITEMS = [
     { id: 'anamnesis', icon: HeartPulse, label: 'Anamnese' },
     { id: 'consent', icon: FileSignature, label: 'Consentimento' },
     { id: 'portfolio', icon: ImageIcon, label: 'Portfólio' },
-    { id: 'chat', icon: MessageSquare, label: 'Chat Inteligente' },
     { id: 'settings', icon: Settings, label: 'Configurações' },
 ];
 
@@ -124,7 +124,6 @@ export default function SystemDemo() {
             case 'anamnesis': return <AnamneseView />;
             case 'consent': return <ConsentView />;
             case 'portfolio': return <PortfolioView />;
-            case 'chat': return <ChatView />;
             case 'settings': return <SettingsView />;
             default: return <DashboardView />;
         }
@@ -247,9 +246,9 @@ function DashboardView() {
                     <p className="text-[11px] text-emerald-500 mt-2 font-bold">+22% vs ontem</p>
                 </div>
                 <div className="premium-card p-6 bg-gradient-to-br from-zinc-900 to-black border-gold-polished/10">
-                    <p className="text-[12px] font-black text-zinc-500 uppercase tracking-widest mb-1">Leads (WhatsApp)</p>
+                    <p className="text-[12px] font-black text-zinc-500 uppercase tracking-widest mb-1">Leads (E-mail)</p>
                     <h4 className="text-3xl font-black text-white">24</h4>
-                    <p className="text-[11px] text-gold-polished mt-2 font-bold">12 convertidos p/ orçamento</p>
+                    <p className="text-[11px] text-gold-polished mt-2 font-bold">12 confirmados via link</p>
                 </div>
             </div>
             <div className="premium-card p-6">
@@ -312,7 +311,7 @@ function AppointmentsView() {
                             <div className="p-3 bg-zinc-900 rounded-lg"><Clock className="w-4 h-4 text-zinc-500" /></div>
                             <div>
                                 <p className="text-sm font-bold text-white">Cliente #{1024 + i}</p>
-                                <p className="text-[9px] text-zinc-500 uppercase tracking-tighter">Sessão Agendada via WhatsApp</p>
+                                <p className="text-[9px] text-zinc-500 uppercase tracking-tighter">Confirmado via E-mail</p>
                             </div>
                         </div>
                         <div className="text-right">
@@ -535,60 +534,8 @@ function PortfolioView() {
 
 function ChatView() {
     return (
-        <div className="h-[480px] flex flex-col premium-card border-white/5 overflow-hidden bg-[#0F0F0F]">
-            {/* Header style WhatsApp */}
-            <div className="p-4 bg-[#1A1A1A] border-b border-premium-border flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gold-polished/20 flex items-center justify-center border border-gold-polished/20">
-                    <MessageSquare className="w-5 h-5 text-gold-polished" />
-                </div>
-                <div>
-                    <h2 className="text-2xl font-black text-white uppercase italic tracking-tighter">Escaneie o QR Code</h2>
-                    <p className="text-[10px] text-emerald-500 font-bold uppercase tracking-tighter animate-pulse">Integração WhatsApp Online</p>
-                </div>
-            </div>
-
-            {/* Chat Content */}
-            <div className="flex-1 p-6 space-y-6 overflow-y-auto sidebar-scroll-demo">
-                <div className="flex flex-col gap-2 max-w-[80%]">
-                    <div className="bg-zinc-800/80 p-3 rounded-2xl rounded-tl-none border border-white/5">
-                        <p className="text-[11px] text-zinc-300 font-medium leading-relaxed">
-                            Olá, Estúdio Ink! Identificamos um novo interessado vindo do Instagram. <br />
-                            <span className="text-gold-polished font-black">Cliente: Roberto Souza</span>
-                        </p>
-                    </div>
-                    <span className="text-[11px] text-zinc-600 font-bold ml-1">14:02</span>
-                </div>
-
-                <div className="flex flex-col gap-2 max-w-[80%] ml-auto">
-                    <div className="bg-gold-polished p-3 rounded-2xl rounded-tr-none text-black">
-                        <p className="text-[13px] font-black">Qual o pedido dele?</p>
-                    </div>
-                    <span className="text-[11px] text-zinc-600 font-bold text-right mr-1">14:03</span>
-                </div>
-
-                <div className="flex flex-col gap-2 max-w-[80%]">
-                    <div className="bg-zinc-800/80 p-3 rounded-2xl rounded-tl-none border border-white/5">
-                        <p className="text-[11px] text-zinc-300 font-medium leading-relaxed">
-                            Ele quer um fechamento de braço em Realismo. <br />
-                            Já analisei a agenda e temos vaga para o dia 15/03. <br />
-                            <span className="text-emerald-500 font-black">Devo enviar o orçamento automático de R$ 3.500?</span>
-                        </p>
-                    </div>
-                    <span className="text-[11px] text-zinc-600 font-bold ml-1">14:03</span>
-                </div>
-            </div>
-
-            {/* Input area */}
-            <div className="p-4 bg-[#141414] border-t border-white/5">
-                <div className="flex gap-2">
-                    <div className="flex-1 h-12 bg-black rounded-xl border border-white/10 flex items-center px-4">
-                        <span className="text-[11px] text-zinc-600 font-bold uppercase italic">Aguardando comando...</span>
-                    </div>
-                    <button className="w-10 h-10 bg-gold-polished rounded-xl flex items-center justify-center text-black shadow-[0_0_15px_var(--accent-secondary)]">
-                        <ArrowUpRight className="w-5 h-5" />
-                    </button>
-                </div>
-            </div>
+        <div className="p-8 text-center text-zinc-500">
+            <p className="text-sm font-black uppercase tracking-widest">Módulo em Manutenção</p>
         </div>
     );
 }
@@ -601,7 +548,7 @@ function SettingsView() {
                 {[
                     { l: 'Dados do Estúdio', i: User },
                     { l: 'Planos & Assinatura', i: Star },
-                    { l: 'API WhatsApp InkFlow', i: MessageSquare },
+                    { l: 'Configuração de E-mail', i: MailIcon },
                     { l: 'Segurança & Backups', i: ShieldCheck },
                 ].map((s, i) => (
                     <div key={i} className="flex items-center justify-between p-4 premium-card bg-zinc-900/30 border-white/5 group hover:border-gold-polished/20 transition-all cursor-pointer">

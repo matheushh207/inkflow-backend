@@ -14,7 +14,6 @@ import {
     LogOut,
     Bell,
     User,
-    MessageSquare,
     HeartPulse,
     FileSignature,
     Image as ImageIcon,

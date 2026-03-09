@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
-    MessageSquare,
+    Mail,
     ShieldCheck,
     Smartphone,
     BarChart3,
@@ -117,9 +117,9 @@ export default function LandingPage() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             <BenefitCard
-                                icon={MessageSquare}
-                                title="Atendimento com IA"
-                                description="IA que atende WhatsApp, agenda horários e cadastra orçamentos automaticamente 24h por dia."
+                                icon={Mail}
+                                title="Confirmação por E-mail"
+                                description="Envio automático de links de confirmação para agendamentos e orçamentos, garantindo zero faltas."
                                 color="text-gold-polished"
                             />
                             <BenefitCard
@@ -142,8 +142,8 @@ export default function LandingPage() {
                             />
                             <BenefitCard
                                 icon={Zap}
-                                title="API WhatsApp Grátis"
-                                description="Envie lembretes automáticos e campanhas de marketing sem pagar por mensagens adicionais."
+                                title="SMTP Personalizado"
+                                description="Configure seu próprio servidor de e-mail e envie notificações diretamente da sua conta profissional."
                                 color="text-purple-500"
                             />
                             <BenefitCard
@@ -158,21 +158,21 @@ export default function LandingPage() {
 
                 {/* DEMO SECTION (only if enabled via env) */}
                 {showDemo && (
-                <section id="demonstracao" className="py-24 relative overflow-hidden">
-                    <div className="max-w-[1400px] mx-auto px-6">
-                        <div className="text-center mb-16">
-                            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tighter mb-4">Visualize o Fluxo Completo</h2>
-                            <p className="text-base sm:text-lg text-secondary-text max-w-2xl mx-auto">Explore como cada funcionalidade funciona do início ao fim com nossa interface intuitiva.</p>
-                        </div>
+                    <section id="demonstracao" className="py-24 relative overflow-hidden">
+                        <div className="max-w-[1400px] mx-auto px-6">
+                            <div className="text-center mb-16">
+                                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tighter mb-4">Visualize o Fluxo Completo</h2>
+                                <p className="text-base sm:text-lg text-secondary-text max-w-2xl mx-auto">Explore como cada funcionalidade funciona do início ao fim com nossa interface intuitiva.</p>
+                            </div>
 
-                        <div className="relative group">
-                            <SystemDemo />
-                            {/* Visual decorative elements around the demo */}
-                            <div className="absolute -top-10 -right-10 w-40 h-40 bg-gold-polished/10 rounded-full blur-[80px] -z-10" />
-                            <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-blue-500/10 rounded-full blur-[80px] -z-10" />
+                            <div className="relative group">
+                                <SystemDemo />
+                                {/* Visual decorative elements around the demo */}
+                                <div className="absolute -top-10 -right-10 w-40 h-40 bg-gold-polished/10 rounded-full blur-[80px] -z-10" />
+                                <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-blue-500/10 rounded-full blur-[80px] -z-10" />
+                            </div>
                         </div>
-                    </div>
-                </section>
+                    </section>
                 )}
 
                 {/* CTA SECTION */}

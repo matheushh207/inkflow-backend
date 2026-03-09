@@ -17,7 +17,6 @@ import {
     X,
     Calendar,
     DollarSign,
-    MessageSquare,
     Package,
     Key,
     Link as LinkIcon
@@ -316,7 +315,7 @@ export default function SettingsPage() {
 
                             <div className="space-y-4">
                                 {[
-                                    { key: 'whatsapp', label: 'Alertas via WhatsApp', desc: 'Resumos diários e confirmações de orçamento.' },
+                                    { key: 'email_appointments', label: 'E-mails de Agendamento', desc: 'Confirmações automáticas enviadas aos clientes.' },
                                     { key: 'email', label: 'E-mails Administrativos', desc: 'Relatórios financeiros e avisos de sistema.' },
                                     { key: 'push', label: 'Notificações Push', desc: 'Alertas em tempo real no dashboard.' },
                                 ].map((item) => (
@@ -521,7 +520,6 @@ export default function SettingsPage() {
                                         { key: 'financeiro', label: 'Fluxo de Caixa', icon: DollarSign },
                                         { key: 'clientes', label: 'Base de Clientes', icon: Users },
                                         { key: 'estoque', label: 'Gestão de Estoque', icon: Package },
-                                        { key: 'chat', label: 'Chat & WhatsApp', icon: MessageSquare },
                                         { key: 'configuracoes', label: 'Configurações Master', icon: Settings },
                                     ].map((perm) => (
                                         <div key={perm.key} className="flex justify-between items-center p-4 bg-zinc-900/50 rounded-xl border border-white/5 group hover:border-gold-polished/20 transition-all">
