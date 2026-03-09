@@ -35,6 +35,8 @@ export default function SettingsPage() {
         studioLogo,
         notificationSettings,
         updateStudioInfo,
+        smtpSettings,
+        updateSmtpSettings,
         team
     } = useStore();
 
@@ -53,7 +55,8 @@ export default function SettingsPage() {
         studioCnpj,
         studioPhone,
         studioLogo,
-        notifications: { ...notificationSettings }
+        notifications: { ...notificationSettings },
+        smtp: { ...smtpSettings }
     });
 
     const [security, setSecurity] = useState({
@@ -71,9 +74,10 @@ export default function SettingsPage() {
             studioCnpj,
             studioPhone,
             studioLogo,
-            notifications: { ...notificationSettings }
+            notifications: { ...notificationSettings },
+            smtp: { ...smtpSettings }
         });
-    }, [studioName, studioEmail, studioCnpj, studioPhone, studioLogo, notificationSettings]);
+    }, [studioName, studioEmail, studioCnpj, studioPhone, studioLogo, notificationSettings, smtpSettings]);
 
     const handleSave = () => {
         setIsSaving(true);
@@ -135,6 +139,7 @@ export default function SettingsPage() {
         { icon: Bell, label: 'Notificações' },
         { icon: Lock, label: 'Segurança' },
         { icon: Globe, label: 'White Label' },
+        { icon: Mail, label: 'Conexão de E-mail' },
     ];
 
 
@@ -396,41 +401,75 @@ export default function SettingsPage() {
                         </div>
                     )}
 
-                    {activeTab === 'White Label' && (
-                        <div className="premium-card bg-gold-polished/5 border-gold-polished/20">
-                            <div className="flex justify-between items-start mb-6">
-                                <div>
-                                    <h3 className="text-lg font-bold text-white uppercase flex items-center gap-2">
-                                        <Globe className="w-5 h-5 text-gold-polished" /> Personalização Total
-                                    </h3>
-                                    <p className="text-zinc-500 text-sm italic">Sua marca, sua regra. Nada de links externos.</p>
-                                </div>
-                                <span className="px-3 py-1 bg-gold-polished text-black text-[12px] font-black rounded-full uppercase">Ativo</span>
-                            </div>
+                    {activeTab === 'Conexão de E-mail' && (
+                        <div className="premium-card space-y-8">
+                            <h3 className="text-lg font-bold text-white uppercase flex items-center gap-2">
+                                <Mail className="w-5 h-5 text-gold-polished" /> Configuração de SMTP
+                            </h3>
+                            <p className="text-zinc-500 text-sm italic">Conecte o seu e-mail próprio para enviar confirmações automáticas.</p>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <p className="text-[12px] font-black text-zinc-600 uppercase tracking-widest">Link Público de Reserva</p>
-                                    <div className="flex gap-2">
-                                        <div className="flex-1 bg-black border border-white/5 rounded-xl p-3 text-[13px] text-zinc-500 font-mono flex items-center overflow-hidden">
-                                            <span className="truncate">https://inkflowcrm.onrender.com/reserva</span>
-                                        </div>
-                                        <button
-                                            onClick={handleCopyLink}
-                                            className={`px-4 rounded-xl text-xs font-black uppercase transition-all flex items-center gap-2 whitespace-nowrap ${copied ? 'bg-emerald-500 text-white' : 'bg-zinc-900 border border-white/5 text-white hover:bg-zinc-800'}`}
-                                        >
-                                            {copied ? <CheckCircle2 className="w-3 h-3" /> : null}
-                                            {copied ? 'Copiado' : 'Copiar'}
-                                        </button>
+                                    <label className="text-xs font-black text-secondary-text uppercase tracking-widest ml-1">Servidor SMTP (Host)</label>
+                                    <input
+                                        type="text"
+                                        value={localSettings.smtp.host}
+                                        onChange={(e) => setLocalSettings({ ...localSettings, smtp: { ...localSettings.smtp, host: e.target.value } })}
+                                        className="w-full bg-[#0A0A0A] border border-premium-border rounded-xl p-4 text-base text-white focus:border-gold-polished transition-all outline-none"
+                                        placeholder="smtp.gmail.com"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-black text-secondary-text uppercase tracking-widest ml-1">Porta</label>
+                                    <input
+                                        type="number"
+                                        value={localSettings.smtp.port}
+                                        onChange={(e) => setLocalSettings({ ...localSettings, smtp: { ...localSettings.smtp, port: parseInt(e.target.value) } })}
+                                        className="w-full bg-[#0A0A0A] border border-premium-border rounded-xl p-4 text-base text-white focus:border-gold-polished transition-all outline-none"
+                                        placeholder="587"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-black text-secondary-text uppercase tracking-widest ml-1">E-mail (Usuário)</label>
+                                    <input
+                                        type="email"
+                                        value={localSettings.smtp.user}
+                                        onChange={(e) => setLocalSettings({ ...localSettings, smtp: { ...localSettings.smtp, user: e.target.value } })}
+                                        className="w-full bg-[#0A0A0A] border border-premium-border rounded-xl p-4 text-base text-white focus:border-gold-polished transition-all outline-none"
+                                        placeholder="contato@seu-estudio.com"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-black text-secondary-text uppercase tracking-widest ml-1">Senha / App Password</label>
+                                    <input
+                                        type="password"
+                                        value={localSettings.smtp.pass}
+                                        onChange={(e) => setLocalSettings({ ...localSettings, smtp: { ...localSettings.smtp, pass: e.target.value } })}
+                                        className="w-full bg-[#0A0A0A] border border-premium-border rounded-xl p-4 text-base text-white focus:border-gold-polished transition-all outline-none"
+                                        placeholder="••••••••••••"
+                                    />
+                                </div>
+                                <div className="flex items-center gap-4 p-4 bg-zinc-900/50 rounded-2xl border border-white/5 md:col-span-2">
+                                    <button
+                                        onClick={() => setLocalSettings({ ...localSettings, smtp: { ...localSettings.smtp, secure: !localSettings.smtp.secure } })}
+                                        className={`w-12 h-6 rounded-full relative transition-all duration-300 ${localSettings.smtp.secure ? 'bg-gold-polished' : 'bg-zinc-800'}`}
+                                    >
+                                        <div className={`absolute top-1 w-4 h-4 rounded-full bg-black transition-all duration-300 ${localSettings.smtp.secure ? 'left-7' : 'left-1'}`} />
+                                    </button>
+                                    <div>
+                                        <p className="text-sm font-bold text-white">Usar Conexão Segura (SSL/TLS)</p>
+                                        <p className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">Recomendado para a maioria dos provedores.</p>
                                     </div>
                                 </div>
-                                <div className="space-y-2">
-                                    <p className="text-[12px] font-black text-zinc-600 uppercase tracking-widest">Favicon do Navegador</p>
-                                    <button className="w-full flex items-center  justify-between p-3 bg-black border border-white/5 rounded-xl text-xs font-black text-zinc-500 uppercase">
-                                        <span>Usar logo atual</span>
-                                        <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                                    </button>
-                                </div>
+                            </div>
+
+                            <div className="pt-4">
+                                <button
+                                    onClick={() => updateSmtpSettings(localSettings.smtp)}
+                                    className="btn-premium w-full py-4 text-sm font-black uppercase tracking-widest"
+                                >
+                                    Testar e Salvar Conexão
+                                </button>
                             </div>
                         </div>
                     )}

@@ -137,7 +137,15 @@ interface StoreState {
         email: boolean;
         push: boolean;
     };
+    smtpSettings: {
+        host: string;
+        port: number;
+        secure: boolean;
+        user: string;
+        pass: string;
+    };
     currentUserId: string;
+    tenantId: string;
 }
 
 interface StoreContextType extends StoreState {
@@ -170,6 +178,7 @@ interface StoreContextType extends StoreState {
     recordAnamnesisPrint: (clientId: string) => void;
     updateStudioName: (name: string) => void;
     updateStudioInfo: (info: Partial<StoreState>) => void;
+    updateSmtpSettings: (settings: StoreState['smtpSettings']) => Promise<void>;
     setCurrentUser: (id: string) => void;
 }
 
@@ -215,7 +224,15 @@ const INITIAL_STATE: StoreState = {
         email: true,
         push: false
     },
-    currentUserId: 'admin-1'
+    smtpSettings: {
+        host: '',
+        port: 587,
+        secure: false,
+        user: '',
+        pass: ''
+    },
+    currentUserId: 'admin-1',
+    tenantId: '123' // Mock default
 };
 
 // --- CONTEXT ---
@@ -288,12 +305,24 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setState(prev => ({ ...prev, clients: prev.clients.filter(c => c.id !== id) }));
     };
 
-    const addAppointment = (app: Omit<Appointment, 'id'>) => {
-        const newApp: Appointment = {
-            ...app,
-            id: Math.random().toString(36).substr(2, 9)
-        };
+    const addAppointment = async (app: Omit<Appointment, 'id'>) => {
+        const id = Math.random().toString(36).substr(2, 9);
+        const newApp: Appointment = { ...app, id };
         setState(prev => ({ ...prev, appointments: [newApp, ...prev.appointments] }));
+
+        try {
+            await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/appointments`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ...app,
+                    tenantId: state.tenantId,
+                    userId: state.currentUserId
+                })
+            });
+        } catch (error) {
+            console.error("Failed to sync appointment with backend", error);
+        }
     };
 
     const updateAppointmentStatus = (id: string, status: Appointment['status']) => {
@@ -323,13 +352,31 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         }));
     };
 
-    const addBudget = (budget: Omit<Budget, 'id' | 'date'>) => {
+    const addBudget = async (budget: Omit<Budget, 'id' | 'date'>) => {
+        const id = Math.random().toString(36).substr(2, 9);
         const newBudget: Budget = {
             ...budget,
-            id: Math.random().toString(36).substr(2, 9),
+            id,
             date: 'Agora'
         };
         setState(prev => ({ ...prev, budgets: [newBudget, ...prev.budgets] }));
+
+        try {
+            // Find client email if possible
+            const client = state.clients.find(c => c.id === budget.clientId);
+
+            await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/budgets`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ...budget,
+                    tenantId: state.tenantId,
+                    clientEmail: client?.email
+                })
+            });
+        } catch (error) {
+            console.error("Failed to sync budget with backend", error);
+        }
     };
 
     const moveBudget = (budgetId: string, newStatus: Budget['status']) => {
@@ -508,6 +555,24 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         }));
     };
 
+    const updateSmtpSettings = async (settings: StoreState['smtpSettings']) => {
+        setState(prev => ({ ...prev, smtpSettings: settings }));
+
+        // In a real app, you would call the API here
+        // For this demo/local storage version, the useEffect persistence handles it
+        // But I'll add the API call structure for clarity
+        try {
+            const tenantId = '123'; // Mock tenant ID
+            await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/tenants/${tenantId}/smtp`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(settings)
+            });
+        } catch (error) {
+            console.error("Failed to save SMTP settings to backend", error);
+        }
+    };
+
     const setCurrentUser = (id: string) => {
         setState(prev => ({ ...prev, currentUserId: id }));
     };
@@ -562,6 +627,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             deleteBudget,
             updateStudioName,
             updateStudioInfo,
+            updateSmtpSettings,
             setCurrentUser
         }}>
             {children}

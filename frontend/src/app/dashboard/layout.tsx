@@ -41,7 +41,6 @@ const MENU_ITEMS = [
     { icon: HeartPulse, label: 'Anamnese', href: '/dashboard/anamnesis', permission: 'agenda' },
     { icon: FileSignature, label: 'Consentimento', href: '/dashboard/consent', permission: 'agenda' },
     { icon: ImageIcon, label: 'Portfólio', href: '/dashboard/portfolio', permission: 'any' },
-    { icon: MessageSquare, label: 'Chat', href: '/dashboard/chat', permission: 'chat' },
     { icon: Settings, label: 'Configurações', href: '/dashboard/settings', permission: 'configuracoes' },
 ];
 

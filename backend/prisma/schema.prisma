@@ -17,6 +17,11 @@ model Tenant {
   slug          String         @unique
   logoUrl       String?
   primaryColor  String         @default("#FFD700")
+  mailHost      String?
+  mailPort      Int?
+  mailUser      String?
+  mailPass      String?
+  mailSecure    Boolean        @default(false)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   users         User[]
@@ -83,6 +88,7 @@ model Appointment {
   tenant      Tenant            @relation(fields: [tenantId], references: [id])
   value       Decimal           @db.Decimal(10, 2)
   commission  Decimal           @db.Decimal(10, 2)
+  confirmationToken String?      @unique
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
 }
@@ -117,6 +123,7 @@ model Budget {
   source    String?
   tenantId  String
   tenant    Tenant       @relation(fields: [tenantId], references: [id])
+  confirmationToken String?      @unique
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
 }
