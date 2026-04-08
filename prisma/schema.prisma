@@ -1,0 +1,210 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id            String         @id @default(uuid())
+  name          String
+  slug          String         @unique
+  logoUrl       String?
+  primaryColor  String         @default("#FFD700")
+  mailHost      String?
+  mailPort      Int?
+  mailUser      String?
+  mailPass      String?
+  mailSecure    Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  users         User[]
+  clients       Client[]
+  appointments  Appointment[]
+  inventory     InventoryItem[]
+  budgets       Budget[]
+  financial     FinancialRecord[]
+  subscriptions Subscription[]
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      UserRole @default(ARTIST)
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  appointments Appointment[]
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  ARTIST
+  RECEPTIONIST
+}
+
+model Plan {
+  id            String         @id @default(uuid())
+  name          String
+  description   String?
+  price         Decimal        @db.Decimal(10, 2)
+  maxArtists    Int            @default(1)
+  interval      String         @default("month")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id          String             @id @default(uuid())
+  status      SubscriptionStatus @default(PENDING)
+  expiresAt   DateTime?
+  tenantId    String
+  tenant      Tenant             @relation(fields: [tenantId], references: [id])
+  planId      String
+  plan        Plan               @relation(fields: [planId], references: [id])
+  payments    Payment[]
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+}
+
+enum SubscriptionStatus {
+  PENDING
+  ACTIVE
+  OVERDUE
+  CANCELED
+}
+
+model Payment {
+  id             String        @id @default(uuid())
+  amount         Decimal       @db.Decimal(10, 2)
+  status         PaymentStatus @default(PENDING)
+  method         String?       // PIX, CREDIT_CARD
+  externalId     String?       @unique // Mercado Pago ID
+  subscriptionId String
+  subscription   Subscription  @relation(fields: [subscriptionId], references: [id])
+  paymentUrl     String?       @db.Text
+  qrCode         String?       @db.Text
+  qrCodeBase64   String?       @db.Text
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+model Client {
+  id           String        @id @default(uuid())
+  name         String
+  email        String?
+  phone        String
+  instagram    String?
+  status       ClientStatus  @default(ACTIVE)
+  score        Int           @default(50)
+  lastTattoo   DateTime?
+  totalSpent   Decimal       @default(0) @db.Decimal(10, 2)
+  tenantId     String
+  tenant       Tenant        @relation(fields: [tenantId], references: [id])
+  appointments Appointment[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+enum ClientStatus {
+  ACTIVE
+  VIP
+  RISK
+  INACTIVE
+}
+
+model Appointment {
+  id          String            @id @default(uuid())
+  date        DateTime
+  duration    Int               // in minutes
+  status      AppointmentStatus @default(PENDING)
+  clientId    String
+  client      Client            @relation(fields: [clientId], references: [id])
+  userId      String
+  artist      User              @relation(fields: [userId], references: [id])
+  tenantId    String
+  tenant      Tenant            @relation(fields: [tenantId], references: [id])
+  value       Decimal           @db.Decimal(10, 2)
+  commission  Decimal           @db.Decimal(10, 2)
+  confirmationToken String?      @unique
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+}
+
+enum AppointmentStatus {
+  PENDING
+  WAITING_DEPOSIT
+  CONFIRMED
+  FINISHED
+  CANCELLED
+}
+
+model InventoryItem {
+  id        String   @id @default(uuid())
+  name      String
+  category  String
+  stock     Int      @default(0)
+  minStock  Int      @default(5)
+  unit      String
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Budget {
+  id        String       @id @default(uuid())
+  title     String
+  clientName String
+  value     Decimal?     @db.Decimal(10, 2)
+  status    BudgetStatus @default(NEW)
+  source    String?
+  tenantId  String
+  tenant    Tenant       @relation(fields: [tenantId], references: [id])
+  confirmationToken String?      @unique
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+}
+
+enum BudgetStatus {
+  NEW
+  ANALYZING
+  DEPOSIT_PAID
+  SCHEDULED
+}
+
+model FinancialRecord {
+  id        String      @id @default(uuid())
+  type      FinanceType
+  amount    Decimal     @db.Decimal(10, 2)
+  date      DateTime    @default(now())
+  category  String
+  method    String
+  tenantId  String
+  tenant    Tenant      @relation(fields: [tenantId], references: [id])
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+enum FinanceType {
+  INCOME
+  EXPENSE
+}
