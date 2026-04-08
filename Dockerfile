@@ -10,13 +10,13 @@ ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 WORKDIR /app
 
 # Copiar package.json e package-lock.json do BACKEND para instalar dependências
-COPY backend/package*.json ./
+COPY package*.json ./
 
 # Instalar dependências do Node.js
 RUN npm install
 
 # Copiar o restante do código do BACKEND
-COPY backend/ .
+COPY . .
 
 # Gerar cliente Prisma
 RUN npx prisma generate
