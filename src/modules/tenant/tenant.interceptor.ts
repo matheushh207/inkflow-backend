@@ -16,8 +16,9 @@ export class TenantInterceptor implements NestInterceptor {
                 throw new ForbiddenException('User has no tenant assigned');
             }
 
-            // Set tenantId in the request-scoped service
+            // Set tenantId and role in the request-scoped service
             this.tenantService.setTenantId(user.tenantId);
+            this.tenantService.setRole(user.role);
         }
 
         return next.handle();
