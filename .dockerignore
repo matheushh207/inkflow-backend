@@ -1,7 +1,5 @@
 node_modules
 dist
+npm-debug.log
 .env
-.wwebjs_auth
-.wwebjs_cache
-*.log
 *.tsbuildinfo
