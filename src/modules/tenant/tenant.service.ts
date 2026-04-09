@@ -1,34 +1,37 @@
-import { Injectable, Scope, NotFoundException } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import { REQUEST } from '@nestjs/core';
 import { PrismaService } from '../../prisma/prisma.service';
+import { Request } from 'express';
 
-@Injectable({ scope: Scope.REQUEST })
+@Injectable()
 export class TenantService {
-    private tenantId: string;
-    private role: string;
-
-    constructor(private prisma: PrismaService) {}
+    constructor(
+        private prisma: PrismaService,
+        @Inject(REQUEST) private request: Request
+    ) {}
 
     setTenantId(id: string) {
-        this.tenantId = id;
+        (this.request as any).tenantId = id;
     }
 
     getTenantId(): string {
-        return this.tenantId;
+        return (this.request as any).tenantId;
     }
 
     setRole(role: string) {
-        this.role = role;
+        (this.request as any).role = role;
     }
 
     getRole(): string {
-        return this.role;
+        return (this.request as any).role;
     }
 
     async getTenantProfile() {
-        if (!this.tenantId) throw new NotFoundException('Tenant not identified');
+        const tenantId = (this.request as any).tenantId;
+        if (!tenantId) throw new NotFoundException('Tenant not identified');
         
         const tenant = await this.prisma.tenant.findUnique({
-            where: { id: this.tenantId },
+            where: { id: tenantId },
             include: {
                 users: {
                     where: { role: 'ADMIN' },
@@ -56,13 +59,14 @@ export class TenantService {
     }
 
     async updateTenantProfile(data: any) {
-        if (!this.tenantId) throw new NotFoundException('Tenant not identified');
+        const tenantId = (this.request as any).tenantId;
+        if (!tenantId) throw new NotFoundException('Tenant not identified');
 
         const { name, cnpj, phone, logo, responsibleName, email } = data;
 
         // Update Tenant Info
         const updatedTenant = await this.prisma.tenant.update({
-            where: { id: this.tenantId },
+            where: { id: tenantId },
             data: {
                 name: name,
                 cnpj: cnpj,
@@ -74,7 +78,7 @@ export class TenantService {
         // Update Admin User Info if provided
         if (responsibleName || email) {
             const adminUser = await this.prisma.user.findFirst({
-                where: { tenantId: this.tenantId, role: 'ADMIN' }
+                where: { tenantId: tenantId, role: 'ADMIN' }
             });
 
             if (adminUser) {

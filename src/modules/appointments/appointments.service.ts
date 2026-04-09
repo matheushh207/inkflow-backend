@@ -10,13 +10,14 @@ export class AppointmentsService {
     ) { }
 
     findAll() {
-        return this.prisma.tenantClient.appointment.findMany({
+        return this.prisma.appointment.findMany({
+            where: { tenantId: this.tenantService.getTenantId() },
             include: { client: true, artist: true }
         });
     }
 
     create(data: any) {
-        return this.prisma.tenantClient.appointment.create({
+        return this.prisma.appointment.create({
             data: {
                 ...data,
                 tenantId: this.tenantService.getTenantId()
