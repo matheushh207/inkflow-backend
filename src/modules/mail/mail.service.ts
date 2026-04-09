@@ -81,6 +81,8 @@ export class MailService {
     };
 
     return transporter.sendMail(mailOptions);
+  }
+
   async sendPasswordResetEmail(
     email: string,
     name: string,
