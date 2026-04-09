@@ -30,14 +30,6 @@ import { SubscriptionGuard } from './modules/billing/subscription.guard';
             provide: APP_INTERCEPTOR,
             useClass: TenantInterceptor,
         },
-        {
-            provide: APP_GUARD,
-            useClass: RolesGuard,
-        },
-        {
-            provide: APP_GUARD,
-            useClass: SubscriptionGuard,
-        },
     ],
 })
 export class AppModule { }
