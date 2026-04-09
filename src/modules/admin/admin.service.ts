@@ -75,8 +75,12 @@ export class AdminService {
                     }
                 },
                 appointments: { take: 5, orderBy: { date: 'desc' } },
-                clients: { _count: true },
-                budgets: { _count: true }
+                _count: {
+                    select: {
+                        clients: true,
+                        budgets: true
+                    }
+                }
             }
         });
     }

@@ -12,6 +12,12 @@ export class BillingController {
     }
 
     @UseGuards(AuthGuard('jwt'))
+    @Get('status')
+    async getStatus(@Request() req: any) {
+        return this.billingService.getSubscriptionStatus(req.user.tenantId);
+    }
+
+    @UseGuards(AuthGuard('jwt'))
     @Post('subscribe')
     async subscribe(@Body() body: any) {
         return this.billingService.createSubscription(

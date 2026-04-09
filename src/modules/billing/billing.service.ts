@@ -25,6 +25,14 @@ export class BillingService implements OnModuleInit {
         });
     }
 
+    async getSubscriptionStatus(tenantId: string) {
+        return this.prisma.subscription.findFirst({
+            where: { tenantId },
+            include: { plan: true },
+            orderBy: { createdAt: 'desc' }
+        });
+    }
+
     async createSubscription(planId: string, paymentMethod: 'PIX' | 'CREDIT_CARD', cardToken?: string) {
         const tenantId = this.tenantService.getTenantId();
         const tenant = await this.prisma.tenant.findUnique({ where: { id: tenantId } });
