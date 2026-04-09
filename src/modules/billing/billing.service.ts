@@ -54,12 +54,13 @@ export class BillingService implements OnModuleInit {
             body: {
                 transaction_amount: Number(plan.price),
                 description: `Assinatura InkFlow - Plano ${plan.name}`,
-                payment_method_id: paymentMethod === 'PIX' ? 'pix' : 'visa', // Simplificado para exemplo
+                payment_method_id: paymentMethod === 'PIX' ? 'pix' : 'visa',
                 payer: {
-                    email: 'comprador@email.com', // No sistema real, pegar o email do admin do estúdio
+                    email: tenant.users?.[0]?.email || 'financeiro@inkflow.com',
+                    first_name: tenant.name.split(' ')[0], // Adicionando primeiro nome obrigatrio
                 },
                 installments: 1,
-                notification_url: `${process.env.WEBHOOK_URL}/billing/webhook`,
+                notification_url: process.env.WEBHOOK_URL ? `${process.env.WEBHOOK_URL}/billing/webhook` : undefined,
             }
         };
 
@@ -68,7 +69,13 @@ export class BillingService implements OnModuleInit {
         }
 
         try {
+            console.log('Iniciando criao de pagamento no Mercado Pago...');
             const mpResponse = await paymentApi.create(paymentData);
+            
+            // Log para debug em produo se necessrio
+            if (!mpResponse.point_of_interaction?.transaction_data?.qr_code_base64) {
+                console.warn('Alerta: QR Code no retornado pelo Mercado Pago. Verifique as credenciais e mtodos ativos.');
+            }
 
             return await this.prisma.payment.create({
                 data: {
@@ -77,14 +84,14 @@ export class BillingService implements OnModuleInit {
                     method: paymentMethod,
                     externalId: String(mpResponse.id),
                     subscriptionId: subscription.id,
-                    paymentUrl: mpResponse.point_of_interaction?.transaction_data?.ticket_url,
-                    qrCode: mpResponse.point_of_interaction?.transaction_data?.qr_code,
-                    qrCodeBase64: mpResponse.point_of_interaction?.transaction_data?.qr_code_base64,
+                    paymentUrl: mpResponse.point_of_interaction?.transaction_data?.ticket_url || '',
+                    qrCode: mpResponse.point_of_interaction?.transaction_data?.qr_code || '',
+                    qrCodeBase64: mpResponse.point_of_interaction?.transaction_data?.qr_code_base64 || '',
                 }
             });
         } catch (error) {
-            console.error('Mercado Pago Error:', error);
-            throw new Error('Falha ao gerar pagamento no Mercado Pago');
+            console.error('Erro detalhado Mercado Pago:', error.message, error.stack);
+            throw new Error('Falha ao gerar pagamento no Mercado Pago. Verifique se o PIX est configurado na conta.');
         }
     }
 
