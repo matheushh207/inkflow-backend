@@ -7,6 +7,8 @@ import { TenantModule } from './modules/tenant/tenant.module';
 import { BillingModule } from './modules/billing/billing.module';
 import { ClientsModule } from './modules/clients/clients.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { AppointmentsModule } from './modules/appointments/appointments.module';
+import { BudgetsModule } from './modules/budgets/budgets.module';
 import { APP_INTERCEPTOR, APP_GUARD } from '@nestjs/core';
 import { TenantInterceptor } from './modules/tenant/tenant.interceptor';
 import { RolesGuard } from './modules/auth/roles.guard';
@@ -20,7 +22,9 @@ import { SubscriptionGuard } from './modules/billing/subscription.guard';
         TenantModule,
         BillingModule,
         ClientsModule,
-        AdminModule
+        AdminModule,
+        AppointmentsModule,
+        BudgetsModule
     ],
     controllers: [
         AppController,
@@ -29,6 +33,14 @@ import { SubscriptionGuard } from './modules/billing/subscription.guard';
         {
             provide: APP_INTERCEPTOR,
             useClass: TenantInterceptor,
+        },
+        {
+            provide: APP_GUARD,
+            useClass: RolesGuard,
+        },
+        {
+            provide: APP_GUARD,
+            useClass: SubscriptionGuard,
         },
     ],
 })
