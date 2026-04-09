@@ -1,13 +1,16 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, BadRequestException, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../../prisma/prisma.service';
+import { MailService } from '../mail/mail.service';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthService {
     constructor(
         private prisma: PrismaService,
-        private jwtService: JwtService
+        private jwtService: JwtService,
+        private mailService: MailService
     ) { }
 
     async validateUser(email: string, pass: string): Promise<any> {
@@ -49,7 +52,7 @@ export class AuthService {
         const tenant = await this.prisma.tenant.create({
             data: {
                 name: data.studioName,
-                slug: data.studioName.toLowerCase().replace(/ /g, '-'),
+                slug: data.studioName.toLowerCase().replace(/ /g, '-').replace(/[^\w-]/g, ''),
             }
         });
 
@@ -65,5 +68,68 @@ export class AuthService {
         });
 
         return this.login(user);
+    }
+
+    async forgotPassword(email: string) {
+        const user = await this.prisma.user.findUnique({
+            where: { email },
+            include: { tenant: true }
+        });
+
+        // Security: Don't reveal if user exists
+        if (!user) return { message: 'Se o e-mail estiver cadastrado, um link de recuperação será enviado.' };
+
+        const token = crypto.randomBytes(32).toString('hex');
+        const expires = new Date();
+        expires.setHours(expires.getHours() + 1); // 1 hour validity
+
+        await this.prisma.user.update({
+            where: { id: user.id },
+            data: {
+                resetPasswordToken: token,
+                resetPasswordExpires: expires
+            }
+        });
+
+        // Use global SMTP from ENV as fallback if tenant hasn't configured its own
+        const smtpConfig = {
+            host: user.tenant.mailHost || process.env.MAIL_HOST || '',
+            port: Number(user.tenant.mailPort) || Number(process.env.MAIL_PORT) || 587,
+            secure: user.tenant.mailSecure || process.env.MAIL_SECURE === 'true',
+            user: user.tenant.mailUser || process.env.MAIL_USER || '',
+            pass: user.tenant.mailPass || process.env.MAIL_PASS || '',
+        };
+
+        if (smtpConfig.host && smtpConfig.user) {
+            await this.mailService.sendPasswordResetEmail(user.email, user.name, token, smtpConfig);
+        }
+
+        return { message: 'Se o e-mail estiver cadastrado, um link de recuperação será enviado.' };
+    }
+
+    async resetPassword(token: string, newPass: string) {
+        const user = await this.prisma.user.findFirst({
+            where: {
+                resetPasswordToken: token,
+                resetPasswordExpires: { gt: new Date() }
+            }
+        });
+
+        if (!user) {
+            throw new BadRequestException('Token inválido ou expirado.');
+        }
+
+        const hashedPassword = await bcrypt.hash(newPass, 10);
+
+        await this.prisma.user.update({
+            where: { id: user.id },
+            data: {
+                password: hashedPassword,
+                resetPasswordToken: null,
+                resetPasswordExpires: null
+            }
+        });
+
+        return { message: 'Senha redefinida com sucesso!' };
     }
 }

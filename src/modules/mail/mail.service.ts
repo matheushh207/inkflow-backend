@@ -81,6 +81,35 @@ export class MailService {
     };
 
     return transporter.sendMail(mailOptions);
+  async sendPasswordResetEmail(
+    email: string,
+    name: string,
+    token: string,
+    config: SmtpConfig
+  ) {
+    const transporter = this.createTransporter(config);
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+
+    const mailOptions = {
+      from: `"INK FLOW" <${config.user}>`,
+      to: email,
+      subject: 'Recuperação de Senha - INK FLOW',
+      html: `
+        <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+          <h2 style="color: #FFD700; text-align: center;">Olá, ${name}!</h2>
+          <p>Você solicitou a recuperação da sua senha no **INK FLOW**.</p>
+          <p>Para definir uma nova senha, clique no botão abaixo em até 1 hora:</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${resetLink}" style="background-color: #FFD700; color: #000; padding: 15px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">REDEFINIR MINHA SENHA</a>
+          </div>
+          <p style="font-size: 12px; color: #666;">Se você não solicitou esta alteração, pode ignorar este e-mail com segurança.</p>
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+          <p style="font-size: 10px; color: #999; text-align: center;">Ink Flow Management System // Precision & Style</p>
+        </div>
+      `,
+    };
+
+    return transporter.sendMail(mailOptions);
   }
 }
 
