@@ -1,33 +1,48 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
-import { REQUEST } from '@nestjs/core';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { AsyncLocalStorage } from 'async_hooks';
 import { PrismaService } from '../../prisma/prisma.service';
-import { Request } from 'express';
+
+interface TenantContext {
+    tenantId?: string;
+    role?: string;
+}
+
+const tenantAsyncLocalStorage = new AsyncLocalStorage<TenantContext>();
 
 @Injectable()
 export class TenantService {
-    constructor(
-        private prisma: PrismaService,
-        @Inject(REQUEST) private request: Request
-    ) {}
+    constructor(private prisma: PrismaService) {}
+
+    static getTenantAsyncLocalStorage() {
+        return tenantAsyncLocalStorage;
+    }
 
     setTenantId(id: string) {
-        (this.request as any).tenantId = id;
+        const store = tenantAsyncLocalStorage.getStore();
+        if (store) {
+            store.tenantId = id;
+        }
     }
 
     getTenantId(): string {
-        return (this.request as any).tenantId;
+        const store = tenantAsyncLocalStorage.getStore();
+        return store?.tenantId || '';
     }
 
     setRole(role: string) {
-        (this.request as any).role = role;
+        const store = tenantAsyncLocalStorage.getStore();
+        if (store) {
+            store.role = role;
+        }
     }
 
     getRole(): string {
-        return (this.request as any).role;
+        const store = tenantAsyncLocalStorage.getStore();
+        return store?.role || '';
     }
 
     async getTenantProfile() {
-        const tenantId = (this.request as any).tenantId;
+        const tenantId = this.getTenantId();
         if (!tenantId) throw new NotFoundException('Tenant not identified');
         
         const tenant = await this.prisma.tenant.findUnique({
@@ -59,7 +74,7 @@ export class TenantService {
     }
 
     async updateTenantProfile(data: any) {
-        const tenantId = (this.request as any).tenantId;
+        const tenantId = this.getTenantId();
         if (!tenantId) throw new NotFoundException('Tenant not identified');
 
         const { name, cnpj, phone, logo, responsibleName, email } = data;

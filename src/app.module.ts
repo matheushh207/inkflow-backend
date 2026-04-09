@@ -1,9 +1,10 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { PrismaModule } from './prisma/prisma.module';
 import { AppController } from './app.controller';
 import { MailModule } from './modules/mail/mail.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { TenantModule } from './modules/tenant/tenant.module';
+import { TenantMiddleware } from './modules/tenant/tenant.middleware';
 import { BillingModule } from './modules/billing/billing.module';
 import { ClientsModule } from './modules/clients/clients.module';
 import { AdminModule } from './modules/admin/admin.module';
@@ -44,4 +45,10 @@ import { SubscriptionGuard } from './modules/billing/subscription.guard';
         },
     ],
 })
-export class AppModule { }
+export class AppModule implements NestModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer
+            .apply(TenantMiddleware)
+            .forRoutes('*');
+    }
+}
