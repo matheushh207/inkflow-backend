@@ -35,7 +35,10 @@ export class BillingService implements OnModuleInit {
 
     async createSubscription(planId: string, paymentMethod: 'PIX' | 'CREDIT_CARD', cardToken?: string) {
         const tenantId = this.tenantService.getTenantId();
-        const tenant = await this.prisma.tenant.findUnique({ where: { id: tenantId } });
+        const tenant = await this.prisma.tenant.findUnique({ 
+            where: { id: tenantId },
+            include: { users: true }
+        });
         const plan = await this.prisma.plan.findUnique({ where: { id: planId } });
 
         if (!plan || !tenant) throw new Error('Plan or Tenant not found');
