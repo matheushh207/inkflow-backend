@@ -67,6 +67,19 @@ export class AuthService {
             }
         });
 
+        // ATIVAÇÃO AUTOMÁTICA SAAS: Criar Assinatura de Teste (5 dias)
+        const fiveDaysFromNow = new Date();
+        fiveDaysFromNow.setDate(fiveDaysFromNow.getDate() + 5);
+
+        await this.prisma.subscription.create({
+            data: {
+                tenantId: tenant.id,
+                planId: data.planId || 'solo', // Usa o plano escolhido ou 'solo' como padrão
+                status: 'ACTIVE',
+                expiresAt: fiveDaysFromNow
+            }
+        });
+
         return this.login(user);
     }
 
