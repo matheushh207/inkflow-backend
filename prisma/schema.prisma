@@ -16,6 +16,8 @@ model Tenant {
   name          String
   slug          String         @unique
   logoUrl       String?
+  cnpj          String?
+  phone         String?
   primaryColor  String         @default("#FFD700")
   mailHost      String?
   mailPort      Int?

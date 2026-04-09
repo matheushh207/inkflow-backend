@@ -47,7 +47,7 @@ export class TenantService {
             responsibleName: tenant.users[0]?.name || '',
             cnpj: tenant.cnpj || '',
             phone: tenant.phone || '',
-            logo: tenant.logo || '',
+            logo: tenant.logoUrl || '',
             mailHost: tenant.mailHost,
             mailPort: tenant.mailPort,
             mailUser: tenant.mailUser,
@@ -67,7 +67,7 @@ export class TenantService {
                 name: name,
                 cnpj: cnpj,
                 phone: phone,
-                logo: logo
+                logoUrl: logo
             }
         });
 
