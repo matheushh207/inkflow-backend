@@ -9,10 +9,10 @@ async function main() {
     // 1. Create SUPER_ADMIN
     const hashedPassword = await bcrypt.hash('15975369', 10);
     const superAdmin = await prisma.user.upsert({
-        where: { email: 'admin@inkflow.com.br' }, // Default system email
+        where: { email: 'admin@inkflow.com' }, // Default system email
         update: {},
         create: {
-            email: 'admin@inkflow.com.br',
+            email: 'admin@inkflow.com',
             name: 'InkFlow Master Admin',
             password: hashedPassword,
             role: 'SUPER_ADMIN',
