@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject, forwardRef } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
 import { PrismaService } from '../../prisma/prisma.service';
 
@@ -11,7 +11,10 @@ const tenantAsyncLocalStorage = new AsyncLocalStorage<TenantContext>();
 
 @Injectable()
 export class TenantService {
-    constructor(private prisma: PrismaService) {}
+    constructor(
+        @Inject(forwardRef(() => PrismaService))
+        private prisma: PrismaService
+    ) {}
 
     static getTenantAsyncLocalStorage() {
         return tenantAsyncLocalStorage;

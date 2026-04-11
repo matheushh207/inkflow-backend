@@ -1,10 +1,13 @@
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, OnModuleInit, OnModuleDestroy, Inject, forwardRef } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { TenantService } from '../modules/tenant/tenant.service';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
-    constructor(private readonly tenantService: TenantService) {
+    constructor(
+        @Inject(forwardRef(() => TenantService))
+        private readonly tenantService: TenantService
+    ) {
         super();
     }
 
