@@ -27,5 +27,8 @@ RUN npm run build
 # Expor a porta que a aplicação NestJS escuta (3000 por padrão)
 EXPOSE 3000
 
-# Comando para iniciar a aplicação (migrações e seed acontecem aqui no runtime)
-CMD npx prisma migrate deploy && npx prisma db seed && npm run start:prod
+# Garantir que o script start.sh tenha permissão de execução
+RUN chmod +x start.sh
+
+# Comando para iniciar a aplicação através do script start.sh
+CMD ["./start.sh"]
