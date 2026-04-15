@@ -19,9 +19,13 @@ export class RolesGuard implements CanActivate {
             throw new ForbiddenException('You do not have permission to access this resource');
         }
 
-        // Restrição Adicional: Apenas admin@inkflow.com pode usar a role SUPER_ADMIN
-        if (user.role === 'SUPER_ADMIN' && user.email !== 'admin@inkflow.com') {
-            throw new ForbiddenException('Acesso negado: Este e-mail não tem permissão de Super Admin');
+        // Restrição Adicional e Rigorosa: Apenas admin@inkflow.com pode usar a role SUPER_ADMIN
+        const isSuperAdmin = user.role === 'SUPER_ADMIN';
+        const isAuthorizedEmail = user.email === 'admin@inkflow.com';
+
+        if (isSuperAdmin && !isAuthorizedEmail) {
+            console.error(`Tentativa de acesso SuperAdmin por e-mail não autorizado: ${user.email}`);
+            throw new ForbiddenException('Acesso negado: Este e-mail não tem permissão para usar privilégios de Super Admin');
         }
         
         return true;
