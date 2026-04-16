@@ -1,9 +1,8 @@
-import { Controller, Post, Body } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { MailService } from '../mail/mail.service';
-import { v4 as uuidv4 } from 'uuid';
+import { AuthGuard } from '@nestjs/passport';
+import { SubscriptionGuard } from '../billing/subscription.guard';
 
 @Controller('budgets')
+@UseGuards(AuthGuard('jwt'), SubscriptionGuard)
 export class BudgetController {
     constructor(
         private prisma: PrismaService,
