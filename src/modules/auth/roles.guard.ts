@@ -13,12 +13,21 @@ export class RolesGuard implements CanActivate {
         if (!requiredRoles) {
             return true;
         }
-        const { user } = context.switchToHttp().getRequest();
+        const request = context.switchToHttp().getRequest();
+        const user = request.user;
         
         console.log(`[ACL] Verificando acesso: ${user?.email || 'N/A'} [${user?.role || 'N/A'}] para recurso que exige [${requiredRoles.join(', ')}]`);
         
-        if (!user || !requiredRoles.some((role) => user.role?.includes(role))) {
-            console.log(`[ACL] Bloqueio por Role: Usuário possui [${user?.role || 'N/A'}] mas é necessário [${requiredRoles.join(', ')}]`);
+        if (!user) {
+            console.log(`[ACL] Bloqueio: Usuário não presente no request (AuthGuard falhou ou não executou)`);
+            throw new ForbiddenException('User authentication required');
+        }
+
+        const userRole = user.role;
+        const hasRole = requiredRoles.some((role) => userRole === role);
+
+        if (!hasRole) {
+            console.log(`[ACL] Bloqueio por Role: Usuário possui [${userRole || 'N/A'}] mas é necessário [${requiredRoles.join(', ')}]`);
             throw new ForbiddenException('You do not have permission to access this resource');
         }
 

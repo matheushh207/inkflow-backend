@@ -8,11 +8,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
-            secretOrKey: process.env.JWT_SECRET || 'super-secret-key',
+            secretOrKey: process.env.JWT_SECRET || 'inkflow_secret_key_2026_matheus',
         });
     }
 
     async validate(payload: any) {
+        console.log(`[JWT] Validando payload: ${payload.email} [${payload.role}]`);
         return { 
             userId: payload.sub, 
             email: payload.email, 

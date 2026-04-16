@@ -9,7 +9,7 @@ import { JwtStrategy } from './jwt.strategy';
     imports: [
         PassportModule,
         JwtModule.register({
-            secret: process.env.JWT_SECRET || 'super-secret-key',
+            secret: process.env.JWT_SECRET || 'inkflow_secret_key_2026_matheus',
             signOptions: { expiresIn: '1d' },
         }),
     ],
