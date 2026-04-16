@@ -48,11 +48,12 @@ if [ -n "$DATABASE_URL" ]; then
   # Adiciona timeout extra para conexões lentas no Render
   export PRISMA_CLIENT_ENGINE_TYPE='library'
   
-  # Executa a migração
-  if npx prisma migrate deploy; then
-    echo "==> Migrações aplicadas com sucesso."
+  # Sincroniza o esquema do banco de dados (Forçado)
+  echo "==> Sincronizando esquema do banco (db push)..."
+  if npx prisma db push --accept-data-loss; then
+    echo "==> Banco de dados sincronizado com sucesso."
   else
-    echo "==> ERRO NAS MIGRAÇÕES: P1001 Geralmente significa host inacessível."
+    echo "==> ERRO NA SINCRONIZAÇÃO: P1001 Geralmente significa host inacessível."
     echo "==> Certifique-se de estar usando o hostname IPv4 do Supabase."
     exit 1
   fi
