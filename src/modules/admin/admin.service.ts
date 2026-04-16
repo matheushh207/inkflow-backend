@@ -84,4 +84,11 @@ export class AdminService {
             }
         });
     }
+
+    async updateTenantDiscount(id: string, discount: number) {
+        return this.prisma.tenant.update({
+            where: { id },
+            data: { discount }
+        });
+    }
 }

@@ -43,6 +43,12 @@ export class BillingService implements OnModuleInit {
 
         if (!plan || !tenant) throw new Error('Plan or Tenant not found');
 
+        let finalPrice = Number(plan.price);
+        // Apply discount if liberated by Master Admin
+        if (tenant.discount > 0) {
+            finalPrice = finalPrice * (1 - tenant.discount / 100);
+        }
+
         const subscription = await this.prisma.subscription.create({
             data: {
                 tenantId,
@@ -55,8 +61,8 @@ export class BillingService implements OnModuleInit {
         
         const paymentData: any = {
             body: {
-                transaction_amount: Number(plan.price),
-                description: `Assinatura InkFlow - Plano ${plan.name}`,
+                transaction_amount: Number(finalPrice.toFixed(2)),
+                description: `Assinatura InkFlow - Plano ${plan.name}${tenant.discount > 0 ? ` (${tenant.discount}% OFF)` : ''}`,
                 payment_method_id: paymentMethod === 'PIX' ? 'pix' : 'visa',
                 payer: {
                     email: tenant.users?.[0]?.email || 'financeiro@inkflow.com',

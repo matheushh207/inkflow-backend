@@ -25,6 +25,7 @@ model Tenant {
   mailUser      String?
   mailPass      String?
   mailSecure    Boolean        @default(false)
+  discount      Int            @default(0)   // Discount percentage
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   users         User[]

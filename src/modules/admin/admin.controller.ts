@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, SetMetadata, Param } from '@nestjs/common';
+import { Controller, Get, UseGuards, SetMetadata, Param, Patch, Body } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/roles.guard';
 import { AdminService } from './admin.service';
@@ -18,6 +18,12 @@ export class AdminController {
     @SetMetadata('roles', ['SUPER_ADMIN'])
     async getTenants() {
         return this.adminService.getAllTenants();
+    }
+
+    @Patch('tenants/:id/discount')
+    @SetMetadata('roles', ['SUPER_ADMIN'])
+    async setDiscount(@Param('id') id: string, @Body('discount') discount: number) {
+        return this.adminService.updateTenantDiscount(id, discount);
     }
 
     @Get('tenants/:id')
