@@ -15,7 +15,10 @@ export class RolesGuard implements CanActivate {
         }
         const { user } = context.switchToHttp().getRequest();
         
+        console.log(`[ACL] Verificando acesso: ${user?.email || 'N/A'} [${user?.role || 'N/A'}] para recurso que exige [${requiredRoles.join(', ')}]`);
+        
         if (!user || !requiredRoles.some((role) => user.role?.includes(role))) {
+            console.log(`[ACL] Bloqueio por Role: Usuário possui [${user?.role || 'N/A'}] mas é necessário [${requiredRoles.join(', ')}]`);
             throw new ForbiddenException('You do not have permission to access this resource');
         }
 
@@ -24,7 +27,7 @@ export class RolesGuard implements CanActivate {
         const isAuthorizedEmail = user.email === 'admin@inkflow.com';
 
         if (isSuperAdmin && !isAuthorizedEmail) {
-            console.error(`Tentativa de acesso SuperAdmin por e-mail não autorizado: ${user.email}`);
+            console.log(`[ACL] Bloqueio por E-mail: Role SUPER_ADMIN detectada para e-mail não autorizado: ${user.email}`);
             throw new ForbiddenException('Acesso negado: Este e-mail não tem permissão para usar privilégios de Super Admin');
         }
         
