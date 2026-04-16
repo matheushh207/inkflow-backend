@@ -14,15 +14,25 @@ export class AuthService {
     ) { }
 
     async validateUser(email: string, pass: string): Promise<any> {
+        console.log(`[AUTH] Tentativa de login para: ${email}`);
         const user = await this.prisma.user.findUnique({
             where: { email },
             include: { tenant: true }
         });
 
-        if (user && await bcrypt.compare(pass, user.password)) {
+        if (!user) {
+            console.log(`[AUTH] Usuário não encontrado no banco: ${email}`);
+            return null;
+        }
+
+        const isPasswordValid = await bcrypt.compare(pass, user.password);
+        if (isPasswordValid) {
+            console.log(`[AUTH] Login bem-sucedido para: ${email}`);
             const { password, ...result } = user;
             return result;
         }
+
+        console.log(`[AUTH] Senha INCORRETA para: ${email}`);
         return null;
     }
 
