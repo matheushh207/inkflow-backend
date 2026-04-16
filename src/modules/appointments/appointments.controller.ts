@@ -1,5 +1,9 @@
+import { Controller, Post, Body, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { SubscriptionGuard } from '../billing/subscription.guard';
+import { PrismaService } from '../../prisma/prisma.service';
+import { MailService } from '../mail/mail.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Controller('appointments')
 @UseGuards(AuthGuard('jwt'), SubscriptionGuard)
