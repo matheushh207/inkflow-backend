@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class AdminService {
-    constructor(private prisma: PrismaService) { }
+    constructor(
+        private prisma: PrismaService,
+        private mailService: MailService
+    ) { }
 
     async getGlobalStats() {
         const totalTenants = await this.prisma.tenant.count();
@@ -86,9 +88,59 @@ export class AdminService {
     }
 
     async updateTenantDiscount(id: string, discount: number) {
-        return this.prisma.tenant.update({
+        const tenant = await this.prisma.tenant.update({
             where: { id },
-            data: { discount }
+            data: { discount },
+            include: { 
+                users: { where: { role: 'ADMIN' } } 
+            }
+        });
+
+        // Trigger email if discount > 0 and tenant has SMTP or we use system default
+        if (discount > 0 && tenant.mailHost) {
+            await this.mailService.sendDiscountNotification(
+                tenant.users[0].email,
+                tenant.name,
+                discount,
+                {
+                    host: tenant.mailHost,
+                    port: tenant.mailPort,
+                    secure: tenant.mailSecure,
+                    user: tenant.mailUser,
+                    pass: tenant.mailPass
+                }
+            );
+        }
+
+        return tenant;
+    }
+
+    async extendSubscription(tenantId: string, days: number, isLifetime: boolean = false) {
+        const subscription = await this.prisma.subscription.findFirst({
+            where: { tenantId },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        if (!subscription) throw new Error('Assinatura não encontrada');
+
+        let newExpiration = new Date();
+        
+        if (isLifetime) {
+            // "Vitalício" set to year 2099
+            newExpiration = new Date('2099-12-31T23:59:59Z');
+        } else {
+            // Extend from current expiration or from now if already expired
+            const currentExp = subscription.expiresAt || new Date();
+            const baseDate = currentExp > new Date() ? currentExp : new Date();
+            newExpiration = new Date(baseDate.getTime() + days * 24 * 60 * 60 * 1000);
+        }
+
+        return this.prisma.subscription.update({
+            where: { id: subscription.id },
+            data: { 
+                expiresAt: newExpiration,
+                status: 'ACTIVE' // Ensure it's active if extended
+            }
         });
     }
 }

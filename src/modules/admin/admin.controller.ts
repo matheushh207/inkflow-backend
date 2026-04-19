@@ -26,6 +26,16 @@ export class AdminController {
         return this.adminService.updateTenantDiscount(id, discount);
     }
 
+    @Patch('tenants/:id/extend')
+    @SetMetadata('roles', ['SUPER_ADMIN'])
+    async extendSubscription(
+        @Param('id') id: string, 
+        @Body('days') days: number,
+        @Body('isLifetime') isLifetime: boolean
+    ) {
+        return this.adminService.extendSubscription(id, days, isLifetime);
+    }
+
     @Get('tenants/:id')
     @SetMetadata('roles', ['SUPER_ADMIN'])
     async getTenantDetails(@Param('id') id: string) {

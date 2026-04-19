@@ -12,6 +12,8 @@ import { AppointmentsModule } from './modules/appointments/appointments.module';
 import { BudgetsModule } from './modules/budgets/budgets.module';
 import { PortfolioModule } from './modules/portfolio/portfolio.module';
 import { MercadoPagoModule } from './modules/mercadopago/mercadopago.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
+import { InvitationsModule } from './modules/invitations/invitations.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { TenantInterceptor } from './modules/tenant/tenant.interceptor';
 
@@ -27,7 +29,9 @@ import { TenantInterceptor } from './modules/tenant/tenant.interceptor';
         AppointmentsModule,
         BudgetsModule,
         PortfolioModule,
-        MercadoPagoModule
+        MercadoPagoModule,
+        NotificationsModule,
+        InvitationsModule
     ],
     controllers: [
         AppController

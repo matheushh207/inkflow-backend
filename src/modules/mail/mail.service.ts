@@ -112,6 +112,57 @@ export class MailService {
     };
 
     return transporter.sendMail(mailOptions);
+  async sendGenericEmail(data: {
+    to: string;
+    subject: string;
+    html: string;
+    smtp: SmtpConfig;
+  }) {
+    const transporter = this.createTransporter(data.smtp);
+    const mailOptions = {
+      from: `"INK FLOW" <${data.smtp.user}>`,
+      to: data.to,
+      subject: data.subject,
+      html: `
+        <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+          ${data.html}
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+          <p style="font-size: 10px; color: #999; text-align: center;">Ink Flow Management System // Precision & Style</p>
+        </div>
+      `,
+    };
+    return transporter.sendMail(mailOptions);
+  }
+
+  async sendDiscountNotification(
+    email: string,
+    name: string,
+    percentage: number,
+    config: SmtpConfig
+  ) {
+    const transporter = this.createTransporter(config);
+    const checkoutLink = `${process.env.FRONTEND_URL}/billing`;
+
+    const mailOptions = {
+      from: `"INK FLOW Master" <${config.user}>`,
+      to: email,
+      subject: `🎁 Você recebeu um desconto especial para o estúdio ${name}!`,
+      html: `
+        <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #1a1a1a; border-radius: 10px; background-color: #0A0A0A; color: #fff;">
+          <h2 style="color: #FFD700; text-align: center;">Parabéns, ${name}!</h2>
+          <p style="text-align: center; font-size: 18px;">A Torre de Comando liberou um cupom de <strong>${percentage}% DE DESCONTO</strong> para sua próxima renovação.</p>
+          <p style="text-align: center; color: #999;">Aproveite esta oportunidade para manter sua gestão em alto nível com o melhor preço.</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${checkoutLink}" style="background-color: #7B2CBF; color: #fff; padding: 15px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; border: 1px solid #FFD700;">RESGATAR MEU DESCONTO</a>
+          </div>
+          <p style="font-size: 12px; color: #666; text-align: center;">O desconto será aplicado automaticamente no seu próximo QR Code de pagamento.</p>
+          <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;" />
+          <p style="font-size: 10px; color: #444; text-align: center;">Ink Flow Management System // Luxury & Control</p>
+        </div>
+      `,
+    };
+
+    return transporter.sendMail(mailOptions);
   }
 }
 

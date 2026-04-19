@@ -36,6 +36,8 @@ model Tenant {
   financial     FinancialRecord[]
   subscriptions Subscription[]
   portfolio     PortfolioItem[]
+  notifications Notification[]
+  invitations   Invitation[]
 }
 
 model User {
@@ -230,4 +232,33 @@ model FinancialRecord {
 enum FinanceType {
   INCOME
   EXPENSE
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  title     String
+  message   String   @db.Text
+  type      NotificationType @default(INFO)
+  read      Boolean  @default(false)
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+}
+
+model Invitation {
+  id        String   @id @default(uuid())
+  email     String
+  role      UserRole
+  token     String   @unique
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }

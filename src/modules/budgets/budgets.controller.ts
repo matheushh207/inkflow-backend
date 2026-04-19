@@ -1,17 +1,32 @@
-import { Controller, Post, Body, UseGuards, Param } from '@nestjs/common';
+import { Controller, Post, Get, Body, UseGuards, Param, Request } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { SubscriptionGuard } from '../billing/subscription.guard';
 import { PrismaService } from '../../prisma/prisma.service';
 import { MailService } from '../mail/mail.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { v4 as uuidv4 } from 'uuid';
+import { NotificationType } from '@prisma/client';
 
 @Controller('budgets')
 @UseGuards(AuthGuard('jwt'), SubscriptionGuard)
 export class BudgetController {
     constructor(
         private prisma: PrismaService,
-        private mailService: MailService
+        private mailService: MailService,
+        private notificationsService: NotificationsService
     ) { }
+
+    @Get()
+    async findAll(@Request() req) {
+        const tenantId = req.user.tenantId;
+        // Trigger old budget check periodically when listing
+        await this.notificationsService.notifyOldBudgets();
+        
+        return this.prisma.budget.findMany({
+            where: { tenantId },
+            orderBy: { createdAt: 'desc' }
+        });
+    }
 
     @Post()
     async create(@Body() data: any) {
@@ -64,7 +79,8 @@ export class BudgetController {
 export class PublicBudgetController {
     constructor(
         private prisma: PrismaService,
-        private mailService: MailService
+        private mailService: MailService,
+        private notificationsService: NotificationsService
     ) { }
 
     @Post(':slug')
