@@ -1,121 +1,116 @@
-import { Router, Request, Response } from 'express';
+import { Controller, Post, Body, Res, HttpStatus } from '@nestjs/common';
+import { Response } from 'express';
 import { criarPagamentoPix, buscarPagamento } from '../services/mercadoPago';
 import { PrismaClient } from '@prisma/client';
 
-const router = Router();
-const prisma = new PrismaClient();
+@Controller('mercadopago')
+export class MercadoPagoController {
+    private prisma = new PrismaClient();
 
-/**
- * Função isolada para ativar o plano do usuário
- */
-async function ativarPlano(userId: string) {
-    console.log('Iniciando ativação automática do plano para o usuário:', userId);
-    
-    try {
-        // Busca o usuário para encontrar o tenantId
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            include: { tenant: true }
-        });
+    @Post('pix')
+    async criarPix(@Body() body: any) {
+        try {
+            const { email, userId, planId } = body;
 
-        if (!user) {
-            console.error('Usuário não encontrado para ativação de plano:', userId);
-            return;
+            if (!email || !userId || !planId) {
+                return { error: 'Campos obrigatórios: email, userId, planId' };
+            }
+
+            const pagamento = await criarPagamentoPix({ email, userId, planId });
+            return pagamento;
+        } catch (error) {
+            return { error: 'Erro ao gerar pagamento PIX' };
         }
+    }
 
-        const tenantId = user.tenantId;
+    @Post('webhook')
+    async webhook(@Body() body: any, @Res() res: Response) {
+        try {
+            const { data, type } = body;
 
-        // Verifica se já existe uma assinatura para este tenant
-        // Se houver, atualizamos. Se não, criamos uma nova vinculada ao plano Solo como default (ou o que estiver no pagamento)
-        const subscription = await prisma.subscription.findFirst({
-            where: { tenantId },
-            orderBy: { createdAt: 'desc' }
-        });
+            // O Mercado Pago envia notificações de diversos tipos. Focamos no 'payment'.
+            if (type === 'payment' && data && data.id) {
+                const paymentId = data.id;
+                const mpDetails = await buscarPagamento(paymentId);
 
-        const expiresAt = new Date();
-        expiresAt.setDate(expiresAt.getDate() + 30); // 30 dias de acesso
-
-        if (subscription) {
-            await prisma.subscription.update({
-                where: { id: subscription.id },
-                data: {
-                    status: 'ACTIVE',
-                    expiresAt: expiresAt
+                // Se o pagamento for aprovado e tiver a referência do usuário
+                if (mpDetails.status === 'approved') {
+                    const userId = mpDetails.external_reference;
+                    if (userId) {
+                        await this.ativarPlano(userId);
+                    }
                 }
-            });
-            console.log(`Plano ativado com sucesso para o Tenant: ${tenantId}`);
-        } else {
-            // Caso não exista assinatura prévia, buscamos o plano 'solo' como fallback
-            const defaultPlan = await prisma.plan.findFirst({
-                where: { 
-                    OR: [
-                        { name: { contains: 'Solo', mode: 'insensitive' } },
-                        { id: 'solo' }
-                    ]
-                }
+            }
+
+            // SEMPRE responder 200 conforme solicitado
+            return res.status(HttpStatus.OK).send('OK');
+        } catch (error) {
+            console.error('Erro no processamento do Webhook:', error);
+            // Mesmo em erro, respondemos 200 para evitar retentativas infinitas do MP
+            return res.status(HttpStatus.OK).send('OK');
+        }
+    }
+
+    /**
+     * Função isolada para ativar o plano do usuário
+     */
+    private async ativarPlano(userId: string) {
+        console.log('Iniciando ativação automática do plano para o usuário:', userId);
+        
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: { id: userId },
+                include: { tenant: true }
             });
 
-            if (defaultPlan) {
-                await prisma.subscription.create({
+            if (!user) {
+                console.error('Usuário não encontrado para ativação de plano:', userId);
+                return;
+            }
+
+            const tenantId = user.tenantId;
+
+            const subscription = await this.prisma.subscription.findFirst({
+                where: { tenantId },
+                orderBy: { createdAt: 'desc' }
+            });
+
+            const expiresAt = new Date();
+            expiresAt.setDate(expiresAt.getDate() + 30);
+
+            if (subscription) {
+                await this.prisma.subscription.update({
+                    where: { id: subscription.id },
                     data: {
-                        tenantId: tenantId,
-                        planId: defaultPlan.id,
                         status: 'ACTIVE',
                         expiresAt: expiresAt
                     }
                 });
-                console.log(`Nova assinatura criada e ativa para o Tenant: ${tenantId}`);
+                console.log(`Plano ativado com sucesso para o Tenant: ${tenantId}`);
             } else {
-                console.error('Falha ao ativar plano: Nenhum plano base encontrado no banco de dados.');
-            }
-        }
-    } catch (error) {
-        console.error('Erro ao ativar plano via webhook:', error);
-    }
-}
+                const defaultPlan = await this.prisma.plan.findFirst({
+                    where: { 
+                        OR: [
+                            { name: { contains: 'Solo', mode: 'insensitive' } },
+                            { id: 'solo' }
+                        ]
+                    }
+                });
 
-// ROTA: Criar Pagamento PIX
-// Body: { email, userId, planId }
-router.post('/mercadopago/pix', async (req: Request, res: Response) => {
-    try {
-        const { email, userId, planId } = req.body;
-
-        if (!email || !userId || !planId) {
-            return res.status(400).json({ error: 'Campos obrigatórios: email, userId, planId' });
-        }
-
-        const pagamento = await criarPagamentoPix({ email, userId, planId });
-        return res.json(pagamento);
-    } catch (error) {
-        return res.status(500).json({ error: 'Erro ao gerar pagamento PIX' });
-    }
-});
-
-// WEBHOOK: Receber notificação do Mercado Pago
-router.post('/mercadopago/webhook', async (req: Request, res: Response) => {
-    try {
-        const { data, type } = req.body;
-
-        // O Mercado Pago envia notificações de diversos tipos. Focamos no 'payment'.
-        if (type === 'payment' && data && data.id) {
-            const paymentId = data.id;
-            const mpDetails = await buscarPagamento(paymentId);
-
-            // Se o pagamento for aprovado e tiver a referência do usuário
-            if (mpDetails.status === 'approved') {
-                const userId = mpDetails.external_reference;
-                if (userId) {
-                    await ativarPlano(userId);
+                if (defaultPlan) {
+                    await this.prisma.subscription.create({
+                        data: {
+                            tenantId: tenantId,
+                            planId: defaultPlan.id,
+                            status: 'ACTIVE',
+                            expiresAt: expiresAt
+                        }
+                    });
+                    console.log(`Nova assinatura criada e ativa para o Tenant: ${tenantId}`);
                 }
             }
+        } catch (error) {
+            console.error('Erro ao ativar plano via webhook:', error);
         }
-
-        // SEMPRE responder 200 conforme solicitado
-        return res.status(200).send('OK');
-    } catch (error) {
-        console.error('Erro no processamento do Webhook:', error);
-        return res.status(200).send('OK'); // Mesmo em erro, respondemos 200 para evitar retentativas infinitas do MP
     }
-});
-
-export default router;
+}
