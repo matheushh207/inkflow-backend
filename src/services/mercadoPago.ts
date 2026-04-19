@@ -38,7 +38,7 @@ export async function criarPagamentoPix({ email, userId, planId }: PaymentData) 
         description: description,
         payment_method_id: 'pix',
         external_reference: userId, // Identificador do usuário para o webhook
-        notification_url: `${process.env.WEBHOOK_URL || 'https://inkflow-crm.onrender.com'}/api/webhook/mercadopago`,
+        notification_url: `${process.env.WEBHOOK_URL || 'https://inkflow-crm.onrender.com'}/mercadopago/webhook`,
         payer: {
             email: email,
             first_name: 'Cliente',

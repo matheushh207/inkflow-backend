@@ -76,7 +76,7 @@ async function ativarPlano(userId: string) {
 
 // ROTA: Criar Pagamento PIX
 // Body: { email, userId, planId }
-router.post('/api/mp/pix', async (req: Request, res: Response) => {
+router.post('/mercadopago/pix', async (req: Request, res: Response) => {
     try {
         const { email, userId, planId } = req.body;
 
@@ -92,7 +92,7 @@ router.post('/api/mp/pix', async (req: Request, res: Response) => {
 });
 
 // WEBHOOK: Receber notificação do Mercado Pago
-router.post('/api/webhook/mercadopago', async (req: Request, res: Response) => {
+router.post('/mercadopago/webhook', async (req: Request, res: Response) => {
     try {
         const { data, type } = req.body;
 
