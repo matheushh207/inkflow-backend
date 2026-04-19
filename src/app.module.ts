@@ -11,11 +11,9 @@ import { AdminModule } from './modules/admin/admin.module';
 import { AppointmentsModule } from './modules/appointments/appointments.module';
 import { BudgetsModule } from './modules/budgets/budgets.module';
 import { PortfolioModule } from './modules/portfolio/portfolio.module';
-import { MercadoPagoController } from './routes/mercadoPago';
-import { APP_INTERCEPTOR, APP_GUARD } from '@nestjs/core';
+import { MercadoPagoModule } from './modules/mercadopago/mercadopago.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { TenantInterceptor } from './modules/tenant/tenant.interceptor';
-import { RolesGuard } from './modules/auth/roles.guard';
-import { SubscriptionGuard } from './modules/billing/subscription.guard';
 
 @Module({
     imports: [
@@ -28,11 +26,11 @@ import { SubscriptionGuard } from './modules/billing/subscription.guard';
         AdminModule,
         AppointmentsModule,
         BudgetsModule,
-        PortfolioModule
+        PortfolioModule,
+        MercadoPagoModule
     ],
     controllers: [
-        AppController,
-        MercadoPagoController
+        AppController
     ],
     providers: [
         {
