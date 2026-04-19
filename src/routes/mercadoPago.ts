@@ -1,24 +1,29 @@
-import { Controller, Post, Body, Res, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, Res, HttpStatus, UseGuards, Req } from '@nestjs/common';
 import { Response } from 'express';
 import { criarPagamentoPix, buscarPagamento } from '../services/mercadoPago';
 import { PrismaClient } from '@prisma/client';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('mercadopago')
 export class MercadoPagoController {
     private prisma = new PrismaClient();
 
+    @UseGuards(AuthGuard('jwt'))
     @Post('pix')
-    async criarPix(@Body() body: any) {
+    async criarPix(@Body() body: any, @Req() req: any) {
         try {
-            const { email, userId, planId } = body;
+            const { planId } = body;
+            const userId = req.user.userId;
+            const email = req.user.email;
 
-            if (!email || !userId || !planId) {
-                return { error: 'Campos obrigatórios: email, userId, planId' };
+            if (!planId) {
+                return { error: 'Campo obrigatório: planId' };
             }
 
             const pagamento = await criarPagamentoPix({ email, userId, planId });
             return pagamento;
         } catch (error) {
+            console.error('Erro ao criar pagamento:', error);
             return { error: 'Erro ao gerar pagamento PIX' };
         }
     }
@@ -28,12 +33,10 @@ export class MercadoPagoController {
         try {
             const { data, type } = body;
 
-            // O Mercado Pago envia notificações de diversos tipos. Focamos no 'payment'.
             if (type === 'payment' && data && data.id) {
                 const paymentId = data.id;
                 const mpDetails = await buscarPagamento(paymentId);
 
-                // Se o pagamento for aprovado e tiver a referência do usuário
                 if (mpDetails.status === 'approved') {
                     const userId = mpDetails.external_reference;
                     if (userId) {
@@ -42,18 +45,13 @@ export class MercadoPagoController {
                 }
             }
 
-            // SEMPRE responder 200 conforme solicitado
             return res.status(HttpStatus.OK).send('OK');
         } catch (error) {
             console.error('Erro no processamento do Webhook:', error);
-            // Mesmo em erro, respondemos 200 para evitar retentativas infinitas do MP
             return res.status(HttpStatus.OK).send('OK');
         }
     }
 
-    /**
-     * Função isolada para ativar o plano do usuário
-     */
     private async ativarPlano(userId: string) {
         console.log('Iniciando ativação automática do plano para o usuário:', userId);
         

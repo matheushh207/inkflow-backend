@@ -49,9 +49,9 @@ export async function criarPagamentoPix({ email, userId, planId }: PaymentData) 
     try {
         const response = await payment.create({ body });
         return {
-            payment_id: response.id,
-            qr_code: response.point_of_interaction?.transaction_data?.qr_code,
-            qr_code_base64: response.point_of_interaction?.transaction_data?.qr_code_base64,
+            paymentId: response.id,
+            qrCode: response.point_of_interaction?.transaction_data?.qr_code,
+            qrCodeBase64: response.point_of_interaction?.transaction_data?.qr_code_base64,
             status: response.status
         };
     } catch (error) {
