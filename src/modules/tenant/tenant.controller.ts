@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Patch, Body, UseGuards, Param } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { TenantService } from './tenant.service';
 
@@ -17,5 +17,15 @@ export class TenantController {
     @Patch('profile')
     async updateProfile(@Body() data: any) {
         return this.tenantService.updateTenantProfile(data);
+    }
+}
+
+@Controller('public/tenants')
+export class PublicTenantController {
+    constructor(private readonly tenantService: TenantService) {}
+
+    @Get(':slug')
+    async getPublicProfile(@Param('slug') slug: string) {
+        return this.tenantService.findPublicBySlug(slug);
     }
 }

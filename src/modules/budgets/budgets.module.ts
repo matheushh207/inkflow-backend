@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
-import { BudgetController } from './budgets.controller';
+import { BudgetController, PublicBudgetController } from './budgets.controller';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
-    controllers: [BudgetController],
+    imports: [MailModule],
+    controllers: [BudgetController, PublicBudgetController],
 })
 export class BudgetsModule { }

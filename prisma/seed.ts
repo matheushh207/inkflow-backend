@@ -40,7 +40,7 @@ async function main() {
             interval: 'month'
         },
         {
-            name: 'Professional',
+            name: 'Profissional',
             description: 'Para pequenos estúdios (até 3 artistas)',
             price: 80.00,
             maxArtists: 3,

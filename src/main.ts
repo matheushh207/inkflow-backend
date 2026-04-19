@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import mercadoPagoRouter from './routes/mercadoPago';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -20,6 +21,10 @@ async function bootstrap() {
     app.useGlobalPipes(new ValidationPipe());
     
     app.enableCors();
+    
+    // Registro isolado das rotas do Mercado Pago (Express Router)
+    app.use(mercadoPagoRouter);
+
     const port = process.env.PORT || 3001; // Ajustado para 3001 conforme frontend .env
     
     await app.listen(port, '0.0.0.0');

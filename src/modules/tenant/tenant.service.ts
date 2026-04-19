@@ -80,7 +80,7 @@ export class TenantService {
         const tenantId = this.getTenantId();
         if (!tenantId) throw new NotFoundException('Tenant not identified');
 
-        const { name, cnpj, phone, logo, responsibleName, email } = data;
+        const { name, cnpj, phone, logo, slug, primaryColor, responsibleName, email } = data;
 
         // Update Tenant Info
         const updatedTenant = await this.prisma.tenant.update({
@@ -89,7 +89,9 @@ export class TenantService {
                 name: name,
                 cnpj: cnpj,
                 phone: phone,
-                logoUrl: logo
+                logoUrl: logo,
+                slug: slug,
+                primaryColor: primaryColor
             }
         });
 
@@ -111,5 +113,44 @@ export class TenantService {
         }
 
         return updatedTenant;
+    }
+
+    async updateSmtpSettings(data: any) {
+        const tenantId = this.getTenantId();
+        if (!tenantId) throw new NotFoundException('Tenant not identified');
+
+        return this.prisma.tenant.update({
+            where: { id: tenantId },
+            data: {
+                mailHost: data.host,
+                mailPort: data.port,
+                mailUser: data.user,
+                mailPass: data.pass,
+                mailSecure: data.secure
+            }
+        });
+    }
+
+    async findPublicBySlug(slug: string) {
+        const tenant = await this.prisma.tenant.findUnique({
+            where: { slug },
+            include: {
+                users: {
+                    where: { role: 'ARTIST' },
+                    select: { id: true, name: true }
+                }
+            }
+        });
+
+        if (!tenant) throw new NotFoundException('Estúdio não encontrado');
+
+        return {
+            id: tenant.id,
+            name: tenant.name,
+            logo: tenant.logoUrl,
+            phone: tenant.phone,
+            primaryColor: tenant.primaryColor,
+            artists: tenant.users.map(u => ({ id: u.id, name: u.name }))
+        };
     }
 }

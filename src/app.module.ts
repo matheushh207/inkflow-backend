@@ -10,6 +10,7 @@ import { ClientsModule } from './modules/clients/clients.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { AppointmentsModule } from './modules/appointments/appointments.module';
 import { BudgetsModule } from './modules/budgets/budgets.module';
+import { PortfolioModule } from './modules/portfolio/portfolio.module';
 import { APP_INTERCEPTOR, APP_GUARD } from '@nestjs/core';
 import { TenantInterceptor } from './modules/tenant/tenant.interceptor';
 import { RolesGuard } from './modules/auth/roles.guard';
@@ -25,7 +26,8 @@ import { SubscriptionGuard } from './modules/billing/subscription.guard';
         ClientsModule,
         AdminModule,
         AppointmentsModule,
-        BudgetsModule
+        BudgetsModule,
+        PortfolioModule
     ],
     controllers: [
         AppController,

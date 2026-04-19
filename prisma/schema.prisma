@@ -35,6 +35,7 @@ model Tenant {
   budgets       Budget[]
   financial     FinancialRecord[]
   subscriptions Subscription[]
+  portfolio     PortfolioItem[]
 }
 
 model User {
@@ -183,11 +184,27 @@ model Budget {
   value     Decimal?     @db.Decimal(10, 2)
   status    BudgetStatus @default(NEW)
   source    String?
+  description String?    @db.Text
+  images      String[]
   tenantId  String
   tenant    Tenant       @relation(fields: [tenantId], references: [id])
   confirmationToken String?      @unique
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
+}
+
+model PortfolioItem {
+  id          String   @id @default(uuid())
+  title       String
+  artist      String
+  imageUrl    String
+  isVisible   Boolean  @default(true)
+  views       Int      @default(0)
+  likes       Int      @default(0)
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 enum BudgetStatus {

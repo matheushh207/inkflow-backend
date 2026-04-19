@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Param } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { SubscriptionGuard } from '../billing/subscription.guard';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -40,6 +40,57 @@ export class BudgetController {
         // Send confirmation email using tenant SMTP settings
         // Assuming budget info has a client's email... but Budget model's clientName is string.
         // If there's an email in the payload, use it.
+        if (tenant.mailHost && data.clientEmail) {
+            await this.mailService.sendBudgetConfirmation(
+                data.clientEmail,
+                data.clientName,
+                data.title,
+                token,
+                {
+                    host: tenant.mailHost,
+                    port: tenant.mailPort,
+                    secure: tenant.mailSecure,
+                    user: tenant.mailUser,
+                    pass: tenant.mailPass
+                }
+            );
+        }
+
+        return budget;
+    }
+}
+
+@Controller('public/budgets')
+export class PublicBudgetController {
+    constructor(
+        private prisma: PrismaService,
+        private mailService: MailService
+    ) { }
+
+    @Post(':slug')
+    async createPublic(@Param('slug') slug: string, @Body() data: any) {
+        const token = uuidv4();
+
+        const tenant = await this.prisma.tenant.findUnique({
+            where: { slug }
+        });
+
+        if (!tenant) throw new Error('Estúdio não encontrado');
+
+        const budget = await this.prisma.budget.create({
+            data: {
+                title: data.title,
+                clientName: data.clientName,
+                value: data.value,
+                status: 'NEW',
+                source: 'Reserva Online',
+                description: data.description,
+                images: data.images || [],
+                tenantId: tenant.id,
+                confirmationToken: token,
+            }
+        });
+
         if (tenant.mailHost && data.clientEmail) {
             await this.mailService.sendBudgetConfirmation(
                 data.clientEmail,
