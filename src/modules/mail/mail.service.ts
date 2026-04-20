@@ -112,6 +112,8 @@ export class MailService {
     };
 
     return transporter.sendMail(mailOptions);
+  }
+
   async sendGenericEmail(data: {
     to: string;
     subject: string;
