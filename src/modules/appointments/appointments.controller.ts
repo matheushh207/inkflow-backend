@@ -66,6 +66,7 @@ export class AppointmentController {
     
     @Get()
     async findAll() {
+        console.log('[DEBUG] Fetching appointments');
         // The TenantInterceptor/PrismaService already handles tenant filtering
         return this.prisma.appointment.findMany({
             orderBy: { date: 'asc' },
