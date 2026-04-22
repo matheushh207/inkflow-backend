@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Body, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { SubscriptionGuard } from '../billing/subscription.guard';
 import { PrismaService } from '../../prisma/prisma.service';
