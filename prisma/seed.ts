@@ -18,7 +18,7 @@ async function main() {
             email: 'admin@inkflow.com',
             name: 'InkFlow Master Admin',
             password: hashedPassword,
-            role: 'SUPER_ADMIN',
+            role: 'MASTER',
             // Create a default system tenant for the super admin
             tenant: {
                 create: {
