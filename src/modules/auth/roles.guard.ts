@@ -15,6 +15,12 @@ export class RolesGuard implements CanActivate {
       return true;
     }
     const { user } = context.switchToHttp().getRequest();
+    
+    // Hard restriction for MASTER role: must have the specific core email
+    if (user.role === 'MASTER' && user.email !== 'admin@inkflow.com') {
+      return false;
+    }
+    
     return requiredRoles.some((role) => user.role === role);
   }
 }

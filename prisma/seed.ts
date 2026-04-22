@@ -12,7 +12,7 @@ async function main() {
         where: { email: 'admin@inkflow.com' },
         update: {
             password: hashedPassword,
-            role: 'SUPER_ADMIN',
+            role: 'MASTER',
         },
         create: {
             email: 'admin@inkflow.com',

@@ -12,7 +12,7 @@ export class TenantInterceptor implements NestInterceptor {
 
         if (user) {
             // Validate if user has a tenantId
-            if (!user.tenantId && user.role !== 'SUPER_ADMIN') {
+            if (!user.tenantId && user.role !== 'MASTER') {
                 throw new ForbiddenException('User has no tenant assigned');
             }
 

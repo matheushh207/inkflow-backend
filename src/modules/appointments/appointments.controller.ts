@@ -63,4 +63,13 @@ export class AppointmentController {
 
         return appointment;
     }
+    
+    @Get()
+    async findAll() {
+        // The TenantInterceptor/PrismaService already handles tenant filtering
+        return this.prisma.appointment.findMany({
+            orderBy: { date: 'asc' },
+            include: { client: true, artist: true }
+        });
+    }
 }

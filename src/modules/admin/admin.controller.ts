@@ -9,25 +9,25 @@ export class AdminController {
     constructor(private adminService: AdminService) { }
 
     @Get('stats')
-    @SetMetadata('roles', ['SUPER_ADMIN'])
+    @SetMetadata('roles', ['MASTER'])
     async getStats() {
         return this.adminService.getGlobalStats();
     }
 
     @Get('tenants')
-    @SetMetadata('roles', ['SUPER_ADMIN'])
+    @SetMetadata('roles', ['MASTER'])
     async getTenants() {
         return this.adminService.getAllTenants();
     }
 
     @Patch('tenants/:id/discount')
-    @SetMetadata('roles', ['SUPER_ADMIN'])
+    @SetMetadata('roles', ['MASTER'])
     async setDiscount(@Param('id') id: string, @Body('discount') discount: number) {
         return this.adminService.updateTenantDiscount(id, discount);
     }
 
     @Patch('tenants/:id/extend')
-    @SetMetadata('roles', ['SUPER_ADMIN'])
+    @SetMetadata('roles', ['MASTER'])
     async extendSubscription(
         @Param('id') id: string, 
         @Body('days') days: number,
@@ -37,7 +37,7 @@ export class AdminController {
     }
 
     @Get('tenants/:id')
-    @SetMetadata('roles', ['SUPER_ADMIN'])
+    @SetMetadata('roles', ['MASTER'])
     async getTenantDetails(@Param('id') id: string) {
         return this.adminService.getTenantDetails(id);
     }

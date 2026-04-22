@@ -10,7 +10,7 @@ export class SubscriptionGuard implements CanActivate {
         const user = request.user;
 
         // Skip check for public routes or Super Admins
-        if (!user || user.role === 'SUPER_ADMIN') {
+        if (!user || user.role === 'MASTER') {
             return true;
         }
 

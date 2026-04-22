@@ -34,7 +34,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
                             if (typeof originalOperation === 'function') {
                                 return (...args) => {
                                     const params = args[0] || {};
-                                    if (tenantId && target.tenantService.getRole() !== 'SUPER_ADMIN') {
+                                    if (tenantId && target.tenantService.getRole() !== 'MASTER') {
                                         params.where = {
                                             ...params.where,
                                             tenantId: tenantId
