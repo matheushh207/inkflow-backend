@@ -36,7 +36,7 @@ export class MercadoPagoService {
             description: description,
             payment_method_id: 'pix',
             external_reference: userId,
-            notification_url: `${process.env.WEBHOOK_URL || 'https://inkflow-crm.onrender.com'}/mercadopago/webhook`,
+            notification_url: `${process.env.WEBHOOK_URL || 'https://inkflow-backend-73a5.onrender.com'}/mercadopago/webhook`,
             payer: {
                 email: email,
                 first_name: 'Cliente',
